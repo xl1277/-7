@@ -1,0 +1,3544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>笔耕 · 写作养成</title>
+<style>
+  :root{
+    --paper:#f4f0e7;--card:#fffdf9;--ink:#2b2724;--muted:#8f8574;
+    --line:#e5dccb;--accent:#9a6b3f;--accent-d:#7d5530;
+    --danger:#b4553f;--heart:#d9694f;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:15px;line-height:1.7;
+  }
+  .app{max-width:900px;margin:0 auto;padding:0 18px 80px;}
+
+  header{
+    position:sticky;top:0;z-index:20;background:rgba(244,240,231,.93);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+    padding:13px 0 10px;margin-bottom:14px;
+  }
+  .brand{
+    font-family:Georgia,"Songti SC",serif;font-size:20px;font-weight:700;
+    letter-spacing:2px;display:flex;align-items:baseline;gap:8px;margin-bottom:10px;
+  }
+  .brand span{font-size:12px;font-weight:400;color:var(--muted);letter-spacing:1px}
+  nav{display:flex;gap:6px;flex-wrap:wrap}
+  nav button{
+    border:1px solid transparent;background:transparent;color:var(--muted);
+    padding:6px 14px;border-radius:20px;font-size:14px;cursor:pointer;
+    font-family:inherit;transition:.18s;
+  }
+  nav button:hover{color:var(--ink);background:#eee7d9}
+  nav button.active{background:var(--ink);color:#fdfaf4}
+
+  .level-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;}
+  .level-label{font-size:12px;letter-spacing:1.5px;color:var(--muted)}
+  .level-group{display:flex;gap:3px;background:#eae2d3;padding:3px;border-radius:20px}
+  .level-group button{
+    border:none;background:transparent;color:var(--muted);padding:4px 15px;
+    border-radius:16px;font-size:13px;cursor:pointer;font-family:inherit;transition:.18s;
+  }
+  .level-group button:hover{color:var(--ink)}
+  .level-group button.active{
+    background:var(--card);color:var(--accent-d);font-weight:600;
+    box-shadow:0 1px 3px rgba(120,90,50,.14);
+  }
+  .level-desc{font-size:12.5px;color:var(--muted)}
+
+  .type-bar{
+    display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px;
+    padding:10px 12px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;
+  }
+  .type-bar .tb-label{
+    font-size:12px;letter-spacing:1.5px;color:var(--muted);
+    align-self:center;margin-right:2px;
+  }
+  .type-chip{
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    padding:5px 13px;border-radius:16px;font-size:13px;cursor:pointer;
+    font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .type-chip:hover{background:#f2ece0;color:var(--ink);border-color:#d8cdb8}
+  .type-chip.active{
+    background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;
+  }
+  .type-hint{font-size:12px;color:var(--muted);width:100%;margin-top:2px;padding-left:2px}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 2px rgba(80,60,30,.04);
+  }
+  .label{font-size:12px;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px}
+  .muted{color:var(--muted)}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .spacer{flex:1}
+
+  .prompt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .prompt-head h2{
+    margin:2px 0 6px;font-size:22px;font-family:Georgia,"Songti SC",serif;
+    font-weight:600;letter-spacing:1px;
+  }
+  .tip{font-size:13px;color:var(--accent-d);background:#f7efe2;display:inline-block;padding:3px 10px;border-radius:6px}
+
+  textarea,input[type=text],input[type=password],input[type=number],select{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+    background:#fff;color:var(--ink);font-family:inherit;font-size:14px;
+    outline:none;transition:.15s;
+  }
+  textarea:focus,input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(154,107,63,.09)}
+  #writingArea{
+    min-height:230px;border:none;background:transparent;padding:0;resize:vertical;
+    font-family:"Noto Serif SC",Georgia,"Songti SC","SimSun",serif;
+    font-size:16.5px;line-height:2;letter-spacing:.4px;
+  }
+  #writingArea:focus{box-shadow:none}
+  #writingArea::placeholder{color:#bdb3a1}
+
+  .bar{height:6px;background:#ece4d6;border-radius:4px;overflow:hidden;margin-top:10px}
+  .bar > i{
+    display:block;height:100%;width:0;border-radius:4px;
+    background:linear-gradient(90deg,#c69a6b,#9a6b3f);transition:width .35s ease;
+  }
+  .bar.done > i{background:linear-gradient(90deg,#8fb47a,#5e8a4a)}
+
+  .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:12px;margin-top:2px}
+  .count{font-size:13px;color:var(--muted)}
+  .count b{color:var(--accent);font-size:16px;font-family:Georgia,serif}
+  .inline{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+  .inline select{width:auto;min-width:150px;padding:6px 10px}
+
+  .btn{
+    border:1px solid var(--accent);background:var(--accent);color:#fff;
+    padding:8px 18px;border-radius:9px;font-size:14px;cursor:pointer;
+    font-family:inherit;transition:.18s;white-space:nowrap;
+  }
+  .btn:hover{background:var(--accent-d);border-color:var(--accent-d)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+  .btn.ghost:hover{background:#f2ece0;color:var(--ink);border-color:#d8cdb8}
+  .btn.small{padding:4px 12px;font-size:12.5px;border-radius:7px}
+  .btn.danger{color:var(--danger)}
+  .btn.danger:hover{background:#fbeee9;border-color:#eccfc5;color:var(--danger)}
+
+  .review-card{border-left:3px solid var(--accent)}
+  .review-head{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--line);
+  }
+  #reviewWho{font-size:14px;font-weight:600;letter-spacing:.5px}
+  .review-body{
+    font-family:"Noto Serif SC",Georgia,"Songti SC","SimSun",serif;
+    font-size:15.5px;line-height:2;white-space:pre-wrap;word-break:break-word;
+    max-height:560px;overflow:auto;
+  }
+  .thinking{display:inline-block;animation:blink 1.1s infinite;font-weight:400;color:var(--muted);font-size:13px}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;padding:16px 10px}
+  .stat b{display:block;font-size:26px;font-family:Georgia,serif;color:var(--accent);line-height:1.3}
+  .stat span{font-size:12px;color:var(--muted);letter-spacing:.5px}
+  .timer{font-family:ui-monospace,Menlo,monospace;font-size:18px;color:var(--accent);min-width:64px;text-align:center}
+
+  .goal-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .goal-num{font-size:14px;color:var(--muted)}
+  .goal-num b{font-family:Georgia,serif;font-size:25px;color:var(--accent);margin-right:3px}
+  .goal-badge{font-size:12px;padding:3px 11px;border-radius:12px;background:#f3ece0;color:var(--accent-d);white-space:nowrap}
+
+  .rec-item{padding:12px 0;border-top:1px dashed var(--line)}
+  .rec-item:first-child{border-top:none;padding-top:4px}
+  .rec-title{font-family:Georgia,"Songti SC",serif;font-size:16px;font-weight:600;margin-bottom:3px;letter-spacing:.5px}
+  .rec-meta{font-size:12.5px;color:var(--muted);margin-bottom:5px}
+  .rec-why{font-size:13.5px;line-height:1.75;color:#544c42}
+
+  .char-item{
+    display:flex;align-items:flex-start;gap:12px;padding:13px 12px;margin:0 -12px;
+    border-bottom:1px dashed var(--line);border-radius:11px;cursor:pointer;transition:.16s;
+  }
+  .char-item:hover{background:#faf6ee}
+  .char-item:last-of-type{border-bottom:none}
+  .char-avatar{
+    font-size:26px;line-height:1;width:40px;height:40px;flex:none;
+    display:flex;align-items:center;justify-content:center;background:#f6f0e4;
+    border-radius:10px;overflow:hidden;
+  }
+  .char-avatar img{width:100%;height:100%;object-fit:cover}
+  .char-info{flex:1;min-width:0}
+  .char-name{font-weight:600;margin-bottom:2px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+  .char-desc{
+    font-size:13px;color:var(--muted);line-height:1.6;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .char-actions{display:flex;gap:6px;flex:none;align-items:center}
+
+  .favor-badge{
+    display:inline-flex;align-items:center;gap:2px;font-size:11.5px;
+    padding:1px 8px;border-radius:11px;background:#fdf1e6;color:var(--heart);
+    cursor:pointer;border:1px solid #f2e0cd;font-weight:600;transition:.15s;letter-spacing:.3px;
+  }
+  .favor-badge:hover{background:#f9e4d2;transform:translateY(-1px)}
+  .favor-badge .hb{font-size:11px}
+  .chat-hint-badge{font-size:11px;color:var(--muted);background:#f2ece0;padding:1px 8px;border-radius:10px}
+
+  .modal-mask{
+    position:fixed;inset:0;background:rgba(43,39,36,.42);
+    display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;
+    animation:fade .18s ease;backdrop-filter:blur(2px);
+  }
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .modal{
+    background:var(--card);border-radius:18px;padding:26px 24px 20px;
+    width:100%;max-width:410px;position:relative;
+    box-shadow:0 20px 60px rgba(40,30,15,.3);max-height:88vh;overflow:auto;
+    animation:pop .24s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .modal-close{
+    position:absolute;top:12px;right:14px;border:none;background:transparent;
+    font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px;
+  }
+  .modal-close:hover{background:#f1eade;color:var(--ink)}
+  .favor-avatar{font-size:40px;line-height:1;text-align:center;margin-bottom:6px}
+  .favor-title{text-align:center;font-family:Georgia,"Songti SC",serif;font-size:17px;font-weight:600;margin:0 0 14px;letter-spacing:.5px;}
+  .favor-title em{font-style:normal;color:var(--heart)}
+  .favor-score{text-align:center;margin-bottom:2px}
+  .favor-score b{font-family:Georgia,serif;font-size:40px;color:var(--heart);line-height:1}
+  .favor-score span{font-size:13px;color:var(--muted);margin-left:3px}
+  .favor-level{text-align:center;font-size:13.5px;color:var(--accent-d);letter-spacing:1px;margin-bottom:14px;}
+  .favor-bar{height:8px;background:#f0e7d8;border-radius:5px;overflow:hidden}
+  .favor-bar > i{
+    display:block;height:100%;width:0;border-radius:5px;
+    background:linear-gradient(90deg,#e8a58a,#d9694f);transition:width .5s ease;
+  }
+  .favor-next{text-align:center;font-size:12.5px;color:var(--muted);margin-top:8px}
+  .favor-stats{
+    display:flex;justify-content:center;gap:18px;margin:16px 0 4px;padding:12px 0;
+    border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);
+  }
+  .favor-stats div{text-align:center}
+  .favor-stats b{display:block;font-family:Georgia,serif;font-size:18px;color:var(--accent)}
+  .favor-stats span{font-size:11.5px;color:var(--muted)}
+  .favor-log-title{font-size:12px;letter-spacing:1.5px;color:var(--muted);margin:14px 0 4px}
+  .favor-log-item{
+    display:flex;justify-content:space-between;gap:10px;font-size:12.5px;
+    padding:6px 0;border-bottom:1px dashed var(--line);
+  }
+  .favor-log-item:last-child{border-bottom:none}
+  .favor-log-item .d{color:var(--muted);font-family:ui-monospace,monospace;font-size:11.5px}
+  .favor-log-item .inc{color:var(--heart);font-weight:600;white-space:nowrap}
+
+  .excerpt-form{display:grid;grid-template-columns:1fr 200px auto;gap:8px;align-items:start;margin-top:8px}
+  .excerpt-form textarea{min-height:66px;resize:vertical;font-family:"Noto Serif SC",Georgia,serif;font-size:14.5px}
+  .excerpt-list{margin-top:14px}
+  .excerpt-item{padding:11px 0;border-top:1px dashed var(--line);display:flex;gap:10px;align-items:flex-start}
+  .excerpt-item .txt{flex:1;font-family:"Noto Serif SC",Georgia,serif;font-size:14.5px;line-height:1.9}
+  .excerpt-item .src{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .empty{color:var(--muted);font-size:13.5px;text-align:center;padding:26px 0}
+
+  .work-item{padding:14px 0;border-bottom:1px dashed var(--line)}
+  .work-item:last-child{border-bottom:none}
+  .work-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  .work-text{
+    font-family:"Noto Serif SC",Georgia,serif;font-size:14.5px;line-height:1.95;
+    white-space:pre-wrap;background:#faf6ee;border-radius:8px;padding:11px 13px;
+  }
+  details{margin-top:9px}
+  summary{cursor:pointer;font-size:13px;color:var(--accent);outline:none}
+  .work-review{
+    margin-top:8px;font-size:14px;line-height:1.9;white-space:pre-wrap;
+    font-family:"Noto Serif SC",Georgia,serif;color:#4a423a;
+    border-left:2px solid var(--line);padding-left:12px;
+  }
+
+  .card label{display:block;margin-bottom:14px;font-size:13px;color:var(--muted)}
+  .card label input,.card label select,.card label textarea{margin-top:5px;color:var(--ink)}
+  .field{margin-bottom:14px}
+  .field-label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .checkbox{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+  .checkbox input{width:auto;margin:0}
+
+  .model-input-row{display:flex;gap:8px;align-items:stretch}
+  .model-input-row input{flex:1;margin-top:0}
+  .model-list{
+    margin-top:10px;border:1px solid var(--line);border-radius:10px;
+    max-height:250px;overflow-y:auto;background:#fff;
+    box-shadow:0 2px 10px rgba(80,60,30,.05);
+  }
+  .model-search{padding:8px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;}
+  .model-search input{font-size:13px;padding:6px 10px;margin-top:0}
+  .model-item{
+    padding:8px 13px;font-size:13.5px;cursor:pointer;border-bottom:1px dashed var(--line);
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    transition:.12s;font-family:ui-monospace,Menlo,monospace;letter-spacing:.2px;word-break:break-all;
+  }
+  .model-item:last-child{border-bottom:none}
+  .model-item:hover{background:#faf6ee}
+  .model-item.active{background:#f7efe2;color:var(--accent-d);font-weight:600}
+  .model-item .mk{font-size:11px;color:var(--muted);flex:none;font-family:inherit}
+  .model-empty{padding:18px;font-size:13px;color:var(--muted);text-align:center}
+  .model-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin-top:7px;}
+
+  .toast{
+    position:fixed;left:50%;bottom:38px;transform:translateX(-50%);
+    background:#2b2724;color:#fdfaf4;padding:9px 20px;border-radius:22px;
+    font-size:13.5px;z-index:999;animation:up .22s ease;
+    box-shadow:0 6px 20px rgba(0,0,0,.18);max-width:80vw;text-align:center;
+  }
+  @keyframes up{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+  /* CHAT */
+  .chat-overlay{
+    position:fixed;inset:0;z-index:150;background:var(--paper);
+    display:flex;flex-direction:column;animation:chatIn .2s ease;
+  }
+  @keyframes chatIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .chat-top{
+    flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;
+    border-bottom:1px solid var(--line);background:rgba(255,253,249,.96);
+    backdrop-filter:blur(10px);
+  }
+  .chat-back{
+    border:none;background:transparent;font-size:21px;line-height:1;
+    color:var(--muted);cursor:pointer;padding:6px 9px;border-radius:9px;font-family:inherit;
+  }
+  .chat-back:hover{background:#f1eade;color:var(--ink)}
+  .chat-peer{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+  .chat-peer-avatar{
+    width:38px;height:38px;flex:none;border-radius:10px;background:#f6f0e4;
+    display:flex;align-items:center;justify-content:center;font-size:21px;overflow:hidden;
+  }
+  .chat-peer-avatar img{width:100%;height:100%;object-fit:cover}
+  .chat-peer-name{font-weight:600;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chat-peer-sub{font-size:11.5px;color:var(--muted);line-height:1.35}
+  .chat-icon-btn{
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;transition:.15s;flex:none;
+  }
+  .chat-icon-btn:hover{background:#f2ece0;color:var(--ink)}
+
+  .chat-body{
+    flex:1;overflow-y:auto;padding:18px 14px 6px;
+    display:flex;flex-direction:column;gap:15px;
+  }
+  .chat-empty{
+    color:var(--muted);font-size:13.5px;text-align:center;padding:60px 30px;
+    line-height:2;font-family:"Noto Serif SC",Georgia,serif;
+  }
+  .msg-group{display:flex;flex-direction:column;gap:5px;max-width:84%;}
+  .msg-group.ai{align-items:flex-start;}
+  .msg-group.user{align-items:flex-end;align-self:flex-end;}
+  .msg{display:flex;gap:9px;align-items:flex-start;max-width:100%;}
+  .msg.user{flex-direction:row-reverse}
+  .msg-avatar{
+    width:34px;height:34px;flex:none;border-radius:9px;background:#f6f0e4;
+    display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;
+  }
+  .msg-avatar img{width:100%;height:100%;object-fit:cover}
+  .msg-bubble{
+    background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px 13px;
+    font-family:"Noto Serif SC",Georgia,"Songti SC",serif;
+    font-size:15px;line-height:1.8;white-space:pre-wrap;word-break:break-word;
+    box-shadow:0 1px 2px rgba(80,60,30,.04);max-width:100%;
+  }
+  .msg.user .msg-bubble{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* 表情包/图片消息：更接近微信表情大小的尺寸 */
+  .msg-bubble .msg-image{
+    display:block;max-width:160px;max-height:160px;border-radius:9px;
+    cursor:zoom-in;margin:0;
+  }
+  .msg.user .msg-bubble .msg-image{border:2px solid rgba(255,255,255,.25)}
+  /* 纯表情/图片消息：气泡内边距缩小，看起来更干净 */
+  .msg-bubble.img-only{padding:5px;background:transparent;border:none;box-shadow:none;}
+  .msg.user .msg-bubble.img-only{background:transparent;border:none}
+  .sticker-inline{
+    display:inline-block;max-width:100px;max-height:100px;
+    vertical-align:middle;margin:2px 2px;border-radius:8px;
+  }
+  .typing-dot{color:var(--muted);letter-spacing:2px}
+
+  .chat-input-bar{
+    position:relative;flex:none;display:flex;gap:8px;align-items:flex-end;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);background:rgba(255,253,249,.96);
+    backdrop-filter:blur(10px);
+  }
+  .chat-tool-btn{
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:18px;
+    display:flex;align-items:center;justify-content:center;transition:.15s;flex:none;
+    font-family:inherit;line-height:1;
+  }
+  .chat-tool-btn:hover{background:#f2ece0;color:var(--ink)}
+  .chat-tool-btn.on{background:#f7efe2;border-color:var(--accent);color:var(--accent-d)}
+  .chat-input-bar textarea{
+    flex:1;min-height:44px;max-height:130px;resize:none;border-radius:12px;
+    padding:11px 13px;font-size:14.5px;line-height:1.6;
+    font-family:"Noto Serif SC",Georgia,serif;
+  }
+  .chat-send{
+    border:1px solid var(--accent);background:var(--accent);color:#fff;
+    border-radius:12px;padding:0 18px;height:44px;font-size:14px;cursor:pointer;
+    font-family:inherit;transition:.18s;white-space:nowrap;flex:none;
+  }
+  .chat-send:hover{background:var(--accent-d);border-color:var(--accent-d)}
+  .chat-send:disabled{opacity:.55;cursor:not-allowed}
+
+  .sticker-panel{
+    position:absolute;bottom:100%;left:0;right:0;background:var(--card);
+    border-top:1px solid var(--line);border-radius:16px 16px 0 0;
+    box-shadow:0 -8px 34px rgba(40,30,15,.15);max-height:56vh;
+    display:flex;flex-direction:column;animation:stickerUp .2s ease;margin-bottom:2px;
+  }
+  @keyframes stickerUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .sticker-head{
+    display:flex;align-items:center;gap:6px;padding:10px 12px 8px;
+    border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);
+    flex-wrap:wrap;
+  }
+  .sticker-head .st-title{font-weight:600;color:var(--ink);font-size:13.5px}
+  .sticker-head .st-hint{
+    font-size:11px;color:var(--muted);width:100%;
+    padding:2px 0 0;line-height:1.4;
+  }
+  .sticker-grid{
+    flex:1;overflow-y:auto;padding:12px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    align-content:flex-start;
+  }
+  .sticker-cell{
+    position:relative;
+    width:72px;height:72px;
+    flex:none;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:#faf6ee;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;overflow:hidden;
+    transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .sticker-cell:hover{
+    border-color:var(--accent);
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(154,107,63,.16);
+  }
+  .sticker-cell:active{
+    transform:translateY(0) scale(.96);
+  }
+  .sticker-cell.sending{
+    opacity:.45;
+    pointer-events:none;
+    transform:scale(.94);
+  }
+  .sticker-cell.sending::after{
+    content:"";
+    position:absolute;inset:0;
+    background:rgba(154,107,63,.08);
+  }
+  .sticker-cell img{width:100%;height:100%;object-fit:contain;padding:4px;pointer-events:none}
+  .sticker-cell .sname{
+    position:absolute;bottom:0;left:0;right:0;font-size:9.5px;
+    background:rgba(43,39,36,.62);color:#fff;padding:2px 4px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    text-align:center;line-height:1.35;pointer-events:none;
+  }
+  .sticker-cell .sdel{
+    position:absolute;top:3px;right:3px;width:19px;height:19px;
+    border-radius:50%;background:rgba(180,85,63,.94);color:#fff;border:none;
+    font-size:13px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:0;
+    box-shadow:0 1px 3px rgba(0,0,0,.2);z-index:2;
+  }
+  .sticker-empty{
+    width:100%;text-align:center;color:var(--muted);
+    font-size:13px;padding:28px 12px;line-height:1.9;
+  }
+  .sticker-count{font-size:11.5px;color:var(--muted)}
+
+  .img-viewer{
+    position:fixed;inset:0;z-index:400;background:rgba(20,16,12,.9);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    cursor:zoom-out;animation:fade .16s ease;
+  }
+  .img-viewer img{
+    max-width:100%;max-height:100%;border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+
+  .sheet-mask{
+    position:absolute;inset:0;background:rgba(43,39,36,.36);
+    display:flex;align-items:flex-end;z-index:10;animation:fade .16s ease;
+  }
+  .sheet{
+    background:var(--card);width:100%;max-height:90%;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom));
+    animation:slideUp .24s cubic-bezier(.2,.9,.3,1.1);
+    box-shadow:0 -10px 40px rgba(40,30,15,.18);
+  }
+  @keyframes slideUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);
+  }
+  .sheet-head h3{
+    margin:0;font-family:Georgia,"Songti SC",serif;font-size:16px;
+    font-weight:600;letter-spacing:1px;
+  }
+  .sheet-sec{margin-bottom:20px}
+  .sheet-sec:last-child{margin-bottom:4px}
+  .sheet-sec-title{
+    font-size:12px;letter-spacing:1.5px;color:var(--muted);
+    margin-bottom:9px;display:flex;align-items:center;gap:8px;
+  }
+  .avatar-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .avatar-field{display:flex;flex-direction:column;gap:6px}
+  .avatar-field label{font-size:12.5px;color:var(--muted)}
+  .avatar-preview{
+    width:46px;height:46px;border-radius:12px;background:#f6f0e4;
+    display:flex;align-items:center;justify-content:center;font-size:24px;
+    overflow:hidden;border:1px solid var(--line);
+  }
+  .avatar-preview img{width:100%;height:100%;object-fit:cover}
+  .avatar-input-row{display:flex;align-items:center;gap:6px}
+  .avatar-input-row input{flex:1;font-size:13.5px;padding:7px 10px;min-width:0}
+  .avatar-upload-btn{
+    flex:none;width:34px;height:34px;border-radius:9px;
+    border:1px solid var(--line);background:#faf6ee;color:var(--accent-d);
+    cursor:pointer;font-size:15px;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+    padding:0;font-family:inherit;
+  }
+  .avatar-upload-btn:hover{background:#f2e8d8;border-color:var(--accent)}
+
+  .range-row{display:flex;align-items:center;gap:12px}
+  .range-row input[type=range]{
+    flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:4px;
+    background:linear-gradient(90deg,#c69a6b,#9a6b3f);outline:none;padding:0;border:none;
+  }
+  .range-row input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:19px;height:19px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+    box-shadow:0 1px 4px rgba(120,90,50,.3);
+  }
+  .range-row input[type=range]::-moz-range-thumb{
+    width:17px;height:17px;border-radius:50%;background:#fff;
+    border:2px solid var(--accent);cursor:pointer;
+  }
+  .range-val{
+    font-family:ui-monospace,monospace;font-size:14px;color:var(--accent);
+    min-width:42px;text-align:right;font-weight:600;
+  }
+  .range-marks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px;padding:0 2px}
+
+  .mem-add{display:flex;gap:8px;margin-bottom:10px}
+  .mem-add input{flex:1;font-size:13.5px}
+  .mem-list{display:flex;flex-direction:column;gap:6px}
+  .mem-item{
+    display:flex;align-items:flex-start;gap:9px;background:#faf6ee;
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+    font-size:13.5px;line-height:1.6;
+  }
+  .mem-item .mt{flex:1;word-break:break-word}
+  .mem-item button{
+    border:none;background:transparent;color:var(--muted);cursor:pointer;
+    font-size:15px;line-height:1;padding:2px 4px;border-radius:6px;flex:none;
+  }
+  .mem-item button:hover{background:#f0e6d6;color:var(--danger)}
+
+  .switch-row{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:11px 0;border-top:1px dashed var(--line);
+  }
+  .switch-row:first-of-type{border-top:none}
+  .switch-row .sw-txt{font-size:13.5px;line-height:1.55}
+  .switch-row .sw-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .switch{position:relative;width:44px;height:25px;flex:none;cursor:pointer;}
+  .switch input{opacity:0;width:0;height:0;position:absolute}
+  .switch .slider{position:absolute;inset:0;background:#dfd5c3;border-radius:14px;transition:.2s;}
+  .switch .slider:before{
+    content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s;
+    box-shadow:0 1px 3px rgba(0,0,0,.15);
+  }
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider:before{transform:translateX(19px)}
+
+  @media(max-width:640px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .excerpt-form{grid-template-columns:1fr}
+    .grid2{grid-template-columns:1fr}
+    .prompt-head{flex-direction:column}
+    .app{padding:0 13px 70px}
+    .level-group button{padding:4px 11px;font-size:12.5px}
+    .avatar-row{grid-template-columns:1fr}
+    .msg-group{max-width:90%}
+    .model-input-row{flex-direction:column}
+    .chat-tool-btn{width:40px;height:40px;font-size:16px}
+    .sticker-cell{width:64px;height:64px}
+    .sticker-grid{gap:7px;padding:10px}
+    .msg-bubble .msg-image{max-width:140px;max-height:140px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">笔耕 <span>写作养成</span></div>
+    <nav id="nav">
+      <button data-tab="write" class="active">练习</button>
+      <button data-tab="read">阅读</button>
+      <button data-tab="chars">角色</button>
+      <button data-tab="works">作品</button>
+      <button data-tab="settings">设置</button>
+    </nav>
+  </header>
+
+  <div class="level-bar">
+    <span class="level-label">今日强度</span>
+    <div class="level-group" id="levelGroup">
+      <button data-level="light">轻量</button>
+      <button data-level="medium">中量</button>
+      <button data-level="heavy">重量</button>
+    </div>
+    <span class="level-desc" id="levelDesc">写 400 字 · 读 25 分钟</span>
+  </div>
+
+  <section class="panel" id="panel-write">
+    <div class="type-bar" id="typeBar">
+      <span class="tb-label">练习类型</span>
+      <div id="typeChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      <div class="type-hint" id="typeHint">—</div>
+    </div>
+
+    <div class="card">
+      <div class="prompt-head">
+        <div>
+          <div class="label" id="promptLabel">今日题目</div>
+          <h2 id="promptTitle">—</h2>
+          <div class="tip" id="promptTip">—</div>
+        </div>
+        <button class="btn ghost small" id="btnNewPrompt">换一题</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <textarea id="writingArea" placeholder="开始写吧……"></textarea>
+      <div class="bar" id="writeBar"><i></i></div>
+      <div class="toolbar">
+        <span class="count"><b id="charCount">0</b> / <span id="charGoal">400</span> 字</span>
+        <span class="spacer"></span>
+        <label class="inline">评阅人
+          <select id="charSelect"></select>
+        </label>
+        <button class="btn" id="btnReview">交予评阅</button>
+      </div>
+      <div class="hint" id="writeFavorHint"></div>
+    </div>
+
+    <div class="card review-card" id="reviewCard" hidden>
+      <div class="review-head">
+        <div id="reviewWho">评阅</div>
+        <button class="btn ghost small" id="btnSaveWork">存入作品集</button>
+      </div>
+      <div class="review-body" id="reviewBody"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-read" hidden>
+    <div class="card stats">
+      <div class="stat"><b id="stStreak">0</b><span>连续天数</span></div>
+      <div class="stat"><b id="stTotal">0</b><span>累计天数</span></div>
+      <div class="stat"><b id="stMonth">0</b><span>本月天数</span></div>
+      <div class="stat"><b id="stMin">0</b><span>累计分钟</span></div>
+    </div>
+
+    <div class="card">
+      <div class="goal-top">
+        <div>
+          <div class="label">今日阅读目标</div>
+          <div class="goal-num"><b id="readDone">0</b> / <span id="readGoal">25</span> 分钟</div>
+        </div>
+        <div class="goal-badge" id="readBadge">中量</div>
+      </div>
+      <div class="bar" id="readBar"><i></i></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button class="btn" id="btnCheckin">今日已阅读 · 打卡</button>
+        <span class="spacer"></span>
+        <span class="timer" id="timerDisplay">00:00</span>
+        <button class="btn ghost" id="btnTimer">开始计时</button>
+      </div>
+      <div class="hint" id="checkinHint"></div>
+      <div class="hint" id="checkinFavor" style="margin-top:4px;color:var(--heart)"></div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:8px">
+        <div class="label" style="margin:0">阅读推荐</div>
+        <span class="spacer"></span>
+        <button class="btn ghost small" id="btnNewRec">换一批</button>
+      </div>
+      <div id="recList"></div>
+    </div>
+
+    <div class="card">
+      <div class="label">摘抄本</div>
+      <div class="excerpt-form">
+        <textarea id="excerptText" placeholder="抄下一句你喜欢的句子……"></textarea>
+        <input id="excerptSource" placeholder="出处（书名 / 作者）">
+        <button class="btn" id="btnAddExcerpt">收录</button>
+      </div>
+      <div class="excerpt-list" id="excerptList"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-chars" hidden>
+    <div class="card">
+      <div class="label">我的评阅人 · 点击角色进入聊天</div>
+      <div class="char-list" id="charList"></div>
+      <div style="margin-top:14px">
+        <button class="btn ghost" id="btnNewChar">＋ 新增角色</button>
+      </div>
+    </div>
+
+    <div class="card" id="charForm" hidden>
+      <div class="label" id="charFormTitle">角色设定</div>
+      <div class="grid2">
+        <label>名字<input id="cfName" placeholder="如：老陈"></label>
+        <label>头像（emoji / 链接 / 上传）<input id="cfEmoji" placeholder="🖋️ 或 https://…" maxlength="200"></label>
+      </div>
+      <label>身份 / 背景
+        <textarea id="cfIdentity" rows="3" placeholder="他是谁？做什么的？相信什么？"></textarea>
+      </label>
+      <label>评阅风格 / 说话方式
+        <textarea id="cfStyle" rows="3" placeholder="说话的语气、关注什么、讨厌什么……"></textarea>
+      </label>
+      <label>补充要求（可选）
+        <textarea id="cfExtra" rows="2" placeholder="例如：每次点评不超过 300 字；必须给出改写示范。"></textarea>
+      </label>
+      <div class="row">
+        <button class="btn" id="cfSave">保存</button>
+        <button class="btn ghost" id="cfCancel">取消</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-works" hidden>
+    <div class="card">
+      <div class="label">作品集</div>
+      <div id="workList"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-settings" hidden>
+    <div class="card">
+      <div class="label">API 设置</div>
+
+      <label>Base URL
+        <input id="setBase" placeholder="https://api.openai.com/v1">
+      </label>
+
+      <label>API Key
+        <input id="setKey" type="password" placeholder="sk-...">
+      </label>
+
+      <div class="field">
+        <div class="field-label">模型名</div>
+        <div class="model-input-row">
+          <input id="setModel" placeholder="gpt-4o-mini / deepseek-chat / qwen-plus ...">
+          <button class="btn ghost small" id="btnFetchModels" type="button">拉取模型</button>
+        </div>
+      </div>
+
+      <div id="modelListWrap" hidden>
+        <div class="model-list">
+          <div class="model-search">
+            <input id="modelSearch" placeholder="筛选模型…">
+          </div>
+          <div id="modelItems"></div>
+        </div>
+        <div class="model-bar">
+          <span id="modelCount"></span>
+          <button class="btn ghost small" id="btnClearModels" type="button">清空列表</button>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:16px">
+        <label>默认 Temperature
+          <input id="setTemp" type="number" step="0.1" min="0" max="2" placeholder="0.8">
+        </label>
+        <label class="checkbox" style="margin-top:24px">
+          <input type="checkbox" id="setStream"> 流式输出
+        </label>
+      </div>
+
+      <div class="row">
+        <button class="btn" id="btnSaveSettings">保存</button>
+        <button class="btn ghost" id="btnTestApi">测试连接</button>
+      </div>
+
+      <div class="hint" id="settingsHint">
+        Base URL 填到 <code>/v1</code> 即可，会自动补上 <code>/chat/completions</code>。
+        所有参数只保存在你自己的浏览器里，不会上传到任何地方。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">数据备份模式</div>
+      <div class="hint" id="backupInfo" style="margin-top:0"></div>
+      <div class="hint" id="backupLast" style="margin-top:4px"></div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="btnExportBackup">导出备份</button>
+        <button class="btn ghost" id="btnImportBackup">导入备份</button>
+        <button class="btn ghost danger" id="btnResetAll">清空数据</button>
+      </div>
+
+      <input type="file" id="backupFileInput" accept=".json,application/json" hidden>
+
+      <div class="hint">
+        备份文件包含：API 设置 · 角色人设 · 好感度 · 聊天记录 · 长期记忆 · 表情包库 · 作品集 · 阅读打卡 · 摘抄本。<br>
+        文件保存在你本地，不会上传。导入会<strong>覆盖</strong>当前全部数据，请先确认。
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-mask" id="favorModal" hidden>
+  <div class="modal">
+    <button class="modal-close" id="favorClose">×</button>
+    <div class="favor-avatar" id="favorAvatar">🖋️</div>
+    <h3 class="favor-title" id="favorTitle">你对 <em>ta</em> 的好感度</h3>
+    <div class="favor-score"><b id="favorPoints">0</b><span>点</span></div>
+    <div class="favor-level" id="favorLevel">初识</div>
+    <div class="favor-bar"><i id="favorBarFill"></i></div>
+    <div class="favor-next" id="favorNext"></div>
+    <div class="favor-stats">
+      <div><b id="favorDays">0</b><span>互动天数</span></div>
+      <div><b id="favorToday">—</b><span>今日已获</span></div>
+      <div><b id="favorNextGain">+5</b><span>明日可得</span></div>
+    </div>
+    <div class="favor-log-title">最近记录</div>
+    <div id="favorLog"></div>
+  </div>
+</div>
+
+<div class="img-viewer" id="imgViewer" hidden>
+  <img id="imgViewerImg" alt="">
+</div>
+
+<div class="chat-overlay" id="chatOverlay" hidden>
+  <div class="chat-top">
+    <button class="chat-back" id="chatBack" title="返回">←</button>
+    <div class="chat-peer">
+      <div class="chat-peer-avatar" id="chatPeerAvatar">🖋️</div>
+      <div style="min-width:0">
+        <div class="chat-peer-name" id="chatPeerName">—</div>
+        <div class="chat-peer-sub" id="chatPeerSub">—</div>
+      </div>
+    </div>
+    <button class="chat-icon-btn" id="chatClearBtn" title="清空对话">🗑</button>
+    <button class="chat-icon-btn" id="chatSettingsBtn" title="聊天设置">⚙</button>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="chat-input-bar" id="chatInputBar">
+    <div class="sticker-panel" id="stickerPanel" hidden>
+      <div class="sticker-head">
+        <span class="st-title">表情包</span>
+        <span class="sticker-count" id="stickerCount"></span>
+        <span class="spacer"></span>
+        <button class="btn ghost small" id="stickerSortBtn" type="button">按时间</button>
+        <button class="btn ghost small" id="stickerManageBtn" type="button">管理</button>
+        <button class="btn ghost small" id="stickerImportBtn" type="button">＋ 选图</button>
+        <button class="btn ghost small" id="stickerDirBtn" type="button">＋ 文件夹</button>
+        <button class="btn ghost small" id="stickerDocxBtn" type="button">＋ docx</button>
+        <div class="st-hint" id="stickerHint">点击表情包发送，发送后自动关闭面板</div>
+      </div>
+      <div class="sticker-grid" id="stickerGrid"></div>
+    </div>
+
+    <button class="chat-tool-btn" id="chatStickerBtn" title="表情包">😀</button>
+    <button class="chat-tool-btn" id="chatImageBtn" title="上传图片">🖼</button>
+    <textarea id="chatInput" placeholder="说点什么…（Enter 发送 · Shift+Enter 换行）"></textarea>
+    <button class="chat-send" id="chatSend">发送</button>
+  </div>
+
+  <input type="file" id="stickerFileInput" accept="image/*" multiple hidden>
+  <input type="file" id="stickerDirInput" accept="image/*" webkitdirectory directory multiple hidden>
+  <input type="file" id="stickerDocxInput"
+         accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+  <input type="file" id="chatImageInput" accept="image/*" hidden>
+  <input type="file" id="avatarFileInput" accept="image/*" hidden>
+
+  <div class="sheet-mask" id="chatSheetMask" hidden>
+    <div class="sheet">
+      <div class="sheet-head">
+        <h3>聊天设置</h3>
+        <button class="modal-close" id="chatSheetClose" style="position:static">×</button>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">头像</div>
+        <div class="avatar-row">
+          <div class="avatar-field">
+            <label>角色头像</label>
+            <div class="avatar-input-row">
+              <div class="avatar-preview" id="cfAvatarPreview">🖋️</div>
+              <input id="chatCharAvatar" placeholder="emoji 或链接">
+              <button class="avatar-upload-btn" id="cfAvatarUploadBtn" type="button" title="上传图片">⬆</button>
+            </div>
+          </div>
+          <div class="avatar-field">
+            <label>你的头像</label>
+            <div class="avatar-input-row">
+              <div class="avatar-preview" id="userAvatarPreview">🙂</div>
+              <input id="chatUserAvatar" placeholder="emoji 或链接">
+              <button class="avatar-upload-btn" id="userAvatarUploadBtn" type="button" title="上传图片">⬆</button>
+            </div>
+          </div>
+        </div>
+        <label style="display:block;margin-top:14px;font-size:12.5px;color:var(--muted)">
+          你的昵称（角色会用这个称呼你）
+          <input id="chatUserName" placeholder="我" style="margin-top:5px">
+        </label>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">温度 · Temperature</div>
+        <div class="range-row">
+          <input type="range" id="chatTemp" min="0" max="2" step="0.05" value="0.8">
+          <span class="range-val" id="chatTempVal">0.80</span>
+        </div>
+        <div class="range-marks">
+          <span>0 · 严谨稳定</span><span>1 · 平衡</span><span>2 · 天马行空</span>
+        </div>
+        <div class="hint" style="margin-top:8px">
+          值越低越克制、越贴近设定；值越高越有想象力，但更容易跑偏。角色扮演建议 0.6–1.0。
+        </div>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">角色发表情包频率</div>
+        <div class="range-row">
+          <input type="range" id="chatStickerFreq" min="0" max="100" step="5" value="30">
+          <span class="range-val" id="chatStickerFreqVal">30%</span>
+        </div>
+        <div class="range-marks">
+          <span>0 · 从不</span><span>50 · 偶尔</span><span>100 · 频繁</span>
+        </div>
+        <div class="hint" style="margin-top:8px" id="stickerFreqHint">
+          控制角色回复时使用表情包的倾向。角色会根据对话情绪自行决定是否使用。
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost small" id="chatStickerManageBtn" type="button">管理表情包库</button>
+          <span class="hint" style="margin:0" id="stickerLibHint"></span>
+        </div>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">
+          长期记忆
+          <span style="letter-spacing:0;color:#b3a893">· 会注入每次对话</span>
+        </div>
+        <div class="mem-add">
+          <input id="chatMemInput" placeholder="手动添加一条记忆，例如：对方在写一部长篇小说">
+          <button class="btn small" id="chatMemAdd">添加</button>
+        </div>
+        <div class="mem-list" id="chatMemList"></div>
+        <div class="switch-row" style="margin-top:12px">
+          <div>
+            <div class="sw-txt">自动提炼记忆</div>
+            <div class="sw-sub">每 6 条消息自动总结一次，会额外调用一次 API</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="chatAutoMem">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn ghost small" id="chatMemExtract">立即提炼一次</button>
+        </div>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">主动聊天的素材</div>
+        <div class="hint" style="margin-top:0;line-height:1.85">
+          角色会自动读取你最近的<strong>阅读打卡</strong>、<strong>摘抄</strong>与<strong>写作练习</strong>，
+          在聊天中自然地把这些当作话题。这些数据只用于拼装本次对话的提示词，不会上传。
+        </div>
+      </div>
+
+      <div class="sheet-sec">
+        <div class="sheet-sec-title">内置指令（始终生效）</div>
+        <div class="hint" style="margin-top:0;line-height:1.85">
+          <b>防 OOC：</b>不跳出角色、不自称 AI、不代替你说话、不输出元描述、人设保持一致。<br>
+          <b>内容准确性：</b>事实类内容宁缺毋滥、不编造引文数据、不确定就说不确定、与记忆和人设保持一致。<br>
+          <b>微信式对话：</b>一次只回一句话，短、自然、不写小作文。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 基础工具 ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+
+function escapeHtml(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 2400);
+}
+function todayKey(d = new Date()){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function avatarHtml(v, fallback){
+  const val = String(v == null ? '' : v).trim() || fallback || '';
+  if(/^(https?:\/\/|data:image)/i.test(val)){
+    return `<img src="${escapeHtml(val)}" alt="" onerror="this.style.display='none'">`;
+  }
+  return escapeHtml(val);
+}
+function normalizeBase(base){
+  let u = String(base || '').trim().replace(/\/+$/,'');
+  u = u.replace(/\/chat\/completions$/,'');
+  return u;
+}
+function chatUrl(base){
+  const u = normalizeBase(base);
+  if(!u) return '';
+  return /\/chat\/completions$/.test(u) ? u : u + '/chat/completions';
+}
+function modelsUrl(base){
+  const u = normalizeBase(base);
+  if(!u) return '';
+  return /\/models$/.test(u) ? u : u + '/models';
+}
+
+function compressImage(file, maxSize, quality){
+  return new Promise((resolve, reject) => {
+    if(!file){ reject(new Error('没有文件')); return; }
+    const hasImgType = /^image\//.test(file.type || '');
+    const hasImgExt  = /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(file.name || '');
+    if(!hasImgType && !hasImgExt){ reject(new Error('不是图片文件')); return; }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        try{
+          const w0 = img.naturalWidth || img.width;
+          const h0 = img.naturalHeight || img.height;
+          if(!w0 || !h0){ reject(new Error('图片尺寸无效')); return; }
+          const scale = Math.min(1, maxSize / Math.max(w0, h0));
+          const w = Math.max(1, Math.round(w0 * scale));
+          const h = Math.max(1, Math.round(h0 * scale));
+          const cv = document.createElement('canvas');
+          cv.width = w; cv.height = h;
+          const ctx = cv.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          let out = '';
+          const keepAlpha = /png|webp|gif|svg/i.test(file.type || '') || /\.(png|gif|webp|svg)$/i.test(file.name || '');
+          if(keepAlpha){
+            out = cv.toDataURL('image/webp', quality);
+            if(!/^data:image\/webp/.test(out)) out = cv.toDataURL('image/png');
+          }else{
+            out = cv.toDataURL('image/jpeg', quality);
+          }
+          if(!out || out.length < 40) throw new Error('生成图片失败');
+          resolve(out);
+        }catch(err){ reject(err); }
+      };
+      img.onerror = () => reject(new Error('图片解码失败'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('读取文件失败'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function isImageFile(f){
+  if(!f) return false;
+  if(/^image\//.test(f.type || '')) return true;
+  return /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(f.name || '');
+}
+
+/* ============ ZIP / DOCX ============ */
+function mimeFromExt(name){
+  const e = String(name || '').split('.').pop().toLowerCase();
+  return ({ png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif',
+            webp:'image/webp', bmp:'image/bmp', svg:'image/svg+xml', avif:'image/avif' })[e] || '';
+}
+function findEOCD(bytes, view){
+  const len = bytes.length;
+  const minPos = Math.max(0, len - 65557 - 22);
+  for(let i = len - 22; i >= minPos; i--){
+    if(view.getUint32(i, true) === 0x06054b50){
+      const cl = view.getUint16(i + 20, true);
+      if(i + 22 + cl <= len) return i;
+    }
+  }
+  return -1;
+}
+function readZipEntries(arrayBuffer){
+  const bytes = new Uint8Array(arrayBuffer);
+  const view = new DataView(arrayBuffer);
+  const eocd = findEOCD(bytes, view);
+  if(eocd < 0) throw new Error('不是有效的 ZIP / docx 文件');
+  let entryCount = view.getUint16(eocd + 10, true);
+  let cdOffset   = view.getUint32(eocd + 16, true);
+  if(cdOffset === 0xffffffff || entryCount === 0xffff){ throw new Error('暂不支持 ZIP64，请用普通 docx'); }
+
+  const entries = [];
+  let p = cdOffset;
+  for(let i = 0; i < entryCount; i++){
+    if(p + 46 > bytes.length) break;
+    if(view.getUint32(p, true) !== 0x02014b50) break;
+    const method     = view.getUint16(p + 10, true);
+    const compSize   = view.getUint32(p + 20, true);
+    const uncompSize = view.getUint32(p + 24, true);
+    const nameLen    = view.getUint16(p + 28, true);
+    const extraLen   = view.getUint16(p + 30, true);
+    const commentLen = view.getUint16(p + 32, true);
+    const localOffset= view.getUint32(p + 42, true);
+    const name = new TextDecoder('utf-8').decode(bytes.subarray(p + 46, p + 46 + nameLen));
+    entries.push({ name, method, compSize, uncompSize, localOffset });
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  return { entries, bytes, view };
+}
+async function readZipEntry(zip, entry){
+  const { bytes, view } = zip;
+  const p = entry.localOffset;
+  if(p + 30 > bytes.length) throw new Error('本地文件头越界');
+  if(view.getUint32(p, true) !== 0x04034b50) throw new Error('本地文件头无效');
+  const nameLen  = view.getUint16(p + 26, true);
+  const extraLen = view.getUint16(p + 28, true);
+  const dataStart = p + 30 + nameLen + extraLen;
+  let compSize = entry.compSize;
+  if(!compSize && entry.uncompSize) compSize = entry.uncompSize;
+  const compData = bytes.subarray(dataStart, dataStart + compSize);
+  if(entry.method === 0) return compData.slice();
+  if(entry.method === 8){
+    if(typeof DecompressionStream === 'undefined'){
+      throw new Error('当前浏览器不支持解压，请用新版 Chrome / Edge / Safari');
+    }
+    const ds = new DecompressionStream('deflate-raw');
+    const stream = new Blob([compData]).stream().pipeThrough(ds);
+    const ab = await new Response(stream).arrayBuffer();
+    return new Uint8Array(ab);
+  }
+  throw new Error('不支持的压缩方式：' + entry.method);
+}
+
+/* ============ 强度 ============ */
+const LEVELS = {
+  light:  { key:'light',  label:'轻量', writeGoal:150, readGoal:10, desc:'写 150 字 · 读 10 分钟' },
+  medium: { key:'medium', label:'中量', writeGoal:400, readGoal:25, desc:'写 400 字 · 读 25 分钟' },
+  heavy:  { key:'heavy',  label:'重量', writeGoal:800, readGoal:45, desc:'写 800 字 · 读 45 分钟' }
+};
+let level = LS.get('bg_level', 'medium');
+if(!LEVELS[level]) level = 'medium';
+
+/* ============ 练习类型 ============ */
+const WRITE_TYPES = {
+  baimiao: {
+    key:'baimiao', label:'白描', icon:'🖋️',
+    sub:'写所见，不抒情、不解释，只写动作与细节',
+    placeholder:'用最省的笔墨，写你看见的。\n\n不抒情，不解释，不比喻，只写动作与细节。',
+    reviewGuide:'白描重"呈现"而非"解释"，重点看动词是否准确、细节是否有可触感，形容词是否堆砌。',
+    prompts:[
+      { t:'写一个人的手', tip:'限制：不许出现「手」字' },
+      { t:'写一场雨', tip:'限制：不许出现「雨」字' },
+      { t:'写等公交的三分钟', tip:'限制：不许出现「等」和「时间」' },
+      { t:'写一碗面刚端上桌', tip:'限制：至少写三个连贯的动作' },
+      { t:'写深夜便利店的店员', tip:'限制：不写他的心理，只写他做的事' },
+      { t:'写母亲在厨房的背影', tip:'限制：不许用「忙碌」「辛劳」这类词' },
+      { t:'写一间刚搬空的房间', tip:'限制：写出空，但不许写「空」字' },
+      { t:'写夏天午后的蝉鸣', tip:'限制：用声音以外的细节去写声音' },
+      { t:'写一位老人系鞋带', tip:'限制：放慢，写足十秒里的动作' },
+      { t:'写两个人沉默的一分钟', tip:'限制：不许写「沉默」「尴尬」' },
+      { t:'写一顿只剩一个人的晚饭', tip:'限制：不抒情，只写物件与动作' },
+      { t:'写清晨菜市场的一个摊位', tip:'限制：只写看见的，不写感受' }
+    ]
+  },
+  xinli: {
+    key:'xinli', label:'心理描写', icon:'💭',
+    sub:'写内心活动：念头、情绪、犹豫、瞬间的闪回',
+    placeholder:'写一个人此刻心里在发生什么。\n\n不直接说"他很伤心"，让读者从念头和细节里看出来。',
+    reviewGuide:'心理描写忌"说情绪"，要看念头是否真实、有没有跳过关键的一步、有没有把感受翻译成具体的画面或念头。',
+    prompts:[
+      { t:'写等待成绩公布前的五分钟', tip:'限制：不许出现「紧张」「焦虑」' },
+      { t:'写听到坏消息的那一秒', tip:'限制：不直接写情绪，只写念头' },
+      { t:'写暗恋的人从身边走过', tip:'限制：不许写「喜欢」两个字' },
+      { t:'写深夜失眠时的想法', tip:'限制：让念头跳跃、不连贯' },
+      { t:'写被误解却无法辩解', tip:'限制：不写「委屈」，写身体的反应' },
+      { t:'写突然想起一件很多年前的往事', tip:'限制：不解释为什么会想起' },
+      { t:'写做出一个决定前的最后一刻', tip:'限制：不许写「犹豫」' },
+      { t:'写看到一条陌生人的讣告', tip:'限制：只写念头，不写评论' }
+    ]
+  },
+  duihua: {
+    key:'duihua', label:'对话描写', icon:'💬',
+    sub:'写两人对话：语气、停顿、潜台词、答非所问',
+    placeholder:'写一段两个人的对话。\n\n不加"他愤怒地说"这类提示语，让对话本身说话。',
+    reviewGuide:'对话描写看的是：有没有潜台词、有没有答非所问、有没有把该说的不说出来、提示语是否多余。',
+    prompts:[
+      { t:'写两个人争论吃什么', tip:'限制：不许用「他大声说」这类提示语' },
+      { t:'写母子久别重逢的第一句话', tip:'限制：对话不超过六句' },
+      { t:'写同事之间客套的寒暄', tip:'限制：写出一句话底下的另一层意思' },
+      { t:'写分手时的最后几句', tip:'限制：谁都没说「分手」两个字' },
+      { t:'写陌生人问路', tip:'限制：只写对话和动作' },
+      { t:'写两个人互相试探', tip:'限制：每句话都有两种读法' },
+      { t:'写饭桌上父子的一次沉默', tip:'限制：对话不超过四句，写停顿' },
+      { t:'写老友重逢却说不到一起', tip:'限制：不许写「尴尬」' }
+    ]
+  },
+  huanjing: {
+    key:'huanjing', label:'环境描写', icon:'🌧️',
+    sub:'写场景与氛围：光、声、气味、温度、空间',
+    placeholder:'写一个场景，让读者置身其中。\n\n不写"很美""很安静"这类判断，用感官细节让人自己感到。',
+    reviewGuide:'环境描写看的是：感官是否调动充分（不只视觉）、有没有和人物处境呼应、有没有堆砌形容词、空间感是否清楚。',
+    prompts:[
+      { t:'写雨后的老巷子', tip:'限制：至少写出三种感官' },
+      { t:'写清晨的火车站', tip:'限制：不写人物，只写环境' },
+      { t:'写夏夜的天台', tip:'限制：不许出现「热」字' },
+      { t:'写深秋的图书馆', tip:'限制：写出安静，但不许写「安静」' },
+      { t:'写除夕的厨房', tip:'限制：至少写五个具体物件' },
+      { t:'写废弃的工厂', tip:'限制：不写「破败」「荒凉」' },
+      { t:'写雪后第一班早班车', tip:'限制：写出冷，但不许写「冷」' },
+      { t:'写凌晨的医院走廊', tip:'限制：只用声音和光线' }
+    ]
+  },
+  dongzuo: {
+    key:'dongzuo', label:'动作描写', icon:'🏃',
+    sub:'写连续动作：拆解、节奏、力度、停顿',
+    placeholder:'写一组连续动作。\n\n把一个大动作拆成若干小动作，让读者看清每一步。',
+    reviewGuide:'动作描写看的是：拆解是否细致、动词是否准确不重复、节奏是否有快慢、有没有多余的修饰、动作是否连贯可信。',
+    prompts:[
+      { t:'写一个人做蛋炒饭', tip:'限制：至少写十二个动作' },
+      { t:'写母亲缝衣服', tip:'限制：不许用「熟练」这个词' },
+      { t:'写老人在公园打太极', tip:'限制：放慢，写出呼吸感' },
+      { t:'写孩子第一次学骑车', tip:'限制：不许写「摔倒了」三个字' },
+      { t:'写理发师剪头发', tip:'限制：用第一人称写' },
+      { t:'写一个人搬家', tip:'限制：只写手上的动作' },
+      { t:'写系一条领带', tip:'限制：不许写「系」这个字' },
+      { t:'写杀一条鱼', tip:'限制：不写心理，只写手' }
+    ]
+  },
+  shuqing: {
+    key:'shuqing', label:'抒情', icon:'🌾',
+    sub:'写情感：不直说，借物、借景、借细节',
+    placeholder:'写一种情感。\n\n不许直接说"我很想念""我很难过"，让情感从细节里渗出来。',
+    reviewGuide:'抒情看的是：有没有直白说情绪、借的物或景是否贴切、有没有过度煽情、留白够不够。',
+    prompts:[
+      { t:'写故乡的某种气味', tip:'限制：不许出现「故乡」两字' },
+      { t:'写失去的某件旧物', tip:'限制：不许写「怀念」「舍不得」' },
+      { t:'写深夜想家的感觉', tip:'限制：只写一个具体的场景' },
+      { t:'写告别一个住过很久的地方', tip:'限制：不写「再见」「告别」' },
+      { t:'写看到一个背影的瞬间', tip:'限制：不许出现「背影」两字' },
+      { t:'写四季更替中的某一天', tip:'限制：不许抒情，只写物' },
+      { t:'写一位已故亲人的某道菜', tip:'限制：不写「想念」' },
+      { t:'写一次没说出口的道别', tip:'限制：只写动作和物件' }
+    ]
+  },
+  xushi: {
+    key:'xushi', label:'叙事', icon:'📖',
+    sub:'写一件小事：起承转合、详略、节奏',
+    placeholder:'写一件小事。\n\n不必完整，但要有起有落，最动人的往往是其中的一个瞬间。',
+    reviewGuide:'叙事看的是：事件是否完整、详略是否得当、有没有高潮、有没有冗余的交代、节奏是否拖沓。',
+    prompts:[
+      { t:'写一次意外的小插曲', tip:'限制：不超过 300 字' },
+      { t:'写一件童年小事', tip:'限制：不许写「小时候」三个字' },
+      { t:'写一次失败的经历', tip:'限制：不写「失败」这个词' },
+      { t:'写一次错过', tip:'限制：不许写「遗憾」「可惜」' },
+      { t:'写一个善意的谎言', tip:'限制：不解释为什么要说谎' },
+      { t:'写一次偶遇', tip:'限制：只写一件事，不分心' },
+      { t:'写一次争吵后的和解', tip:'限制：不许写「和解」「原谅」' },
+      { t:'写一次搬家的过程', tip:'限制：以物为主，人为辅' }
+    ]
+  },
+  renwu: {
+    key:'renwu', label:'人物特写', icon:'👤',
+    sub:'写一个陌生人：外形、动作、口头禅、一个细节',
+    placeholder:'写一个你见过的陌生人。\n\n不写他的故事，只写你看见的那几分钟。',
+    reviewGuide:'人物特写看的是：有没有找到"这一个"而非"这一类"、有没有一个别人不会注意的细节、外形与动作是否服务人物、有没有强加想象。',
+    prompts:[
+      { t:'写地铁上邻座的人', tip:'限制：不写他的职业' },
+      { t:'写楼下小卖部的老板', tip:'限制：写一个别人不会注意的细节' },
+      { t:'写公园长椅上的老人', tip:'限制：不许写「孤独」「沧桑」' },
+      { t:'写雨天撑伞等车的人', tip:'限制：不写他的表情' },
+      { t:'写街边摆摊的年轻人', tip:'限制：不写他的处境' },
+      { t:'写对面楼窗边的人影', tip:'限制：看不清脸，只写轮廓' },
+      { t:'写一个在电梯里遇到的人', tip:'限制：只写那 30 秒' },
+      { t:'写一个反复出现的路人', tip:'限制：不写任何一次具体的相遇' }
+    ]
+  }
+};
+const TYPE_ORDER = ['baimiao','xinli','duihua','huanjing','dongzuo','shuqing','xushi','renwu'];
+
+let writeType = LS.get('bg_writetype', 'baimiao');
+if(!WRITE_TYPES[writeType]) writeType = 'baimiao';
+
+let typePromptIdx = LS.get('bg_typeidx', {});
+if(typeof typePromptIdx !== 'object' || typePromptIdx === null) typePromptIdx = {};
+
+/* ============ 好感度 ============ */
+const FAVOR_LEVELS = [
+  { min:0,   name:'初识',  emoji:'🌱' },
+  { min:30,  name:'眼熟',  emoji:'👀' },
+  { min:80,  name:'熟识',  emoji:'☕' },
+  { min:160, name:'信任',  emoji:'🤝' },
+  { min:280, name:'知己',  emoji:'🫂' },
+  { min:450, name:'莫逆',  emoji:'🔥' }
+];
+function favorLevel(points){
+  let cur = FAVOR_LEVELS[0];
+  for(const l of FAVOR_LEVELS){ if(points >= l.min) cur = l; }
+  return cur;
+}
+function nextFavorLevel(points){ return FAVOR_LEVELS.find(l => l.min > points) || null; }
+function favorGain(days){ return Math.min(5 + days, 10); }
+
+/* ============ 阅读推荐 ============ */
+const READS = [
+  { level:'light', title:'世说新语', author:'刘义庆', tag:'笔记小说',
+    why:'三言两语写活一个人，白描的祖师爷。随手翻一则，看古人怎么用十几个字立住一个形象。' },
+  { level:'light', title:'人间草木', author:'汪曾祺', tag:'散文',
+    why:'写花写草写吃食，句子短，味道长。睡前读两页，第二天写东西手会松。' },
+  { level:'light', title:'雅舍小品', author:'梁实秋', tag:'散文',
+    why:'把日常琐事写出趣味，不靠形容词靠观察。每篇不过千字，读完就能模仿一段。' },
+  { level:'light', title:'我的阿勒泰', author:'李娟', tag:'散文',
+    why:'写边地生活，干净、准确、不煽情。她的白描是活人写活事，不是作文。' },
+  { level:'light', title:'陶庵梦忆', author:'张岱', tag:'古典散文',
+    why:'写景写人写器物，短小而讲究。看古典汉语怎么把画面压进几十个字。' },
+  { level:'light', title:'磨坊书简', author:'都德', tag:'外国散文',
+    why:'短章写普罗旺斯风物，篇幅小，画面感极强。最适合碎片时间。' },
+  { level:'medium', title:'台北人', author:'白先勇', tag:'短篇小说集',
+    why:'十四个短篇，十四个人物。开篇几笔就把人立起来，是学白描最好的小说集。' },
+  { level:'medium', title:'都柏林人', author:'乔伊斯', tag:'短篇小说集',
+    why:'写城市里普通人的一刻顿悟，冷静、精确，几乎不解释情绪。' },
+  { level:'medium', title:'呼兰河传', author:'萧红', tag:'长篇小说',
+    why:'写故乡、祖父和小城，语言带着天真的狠劲。慢，但每一句都结实。' },
+  { level:'medium', title:'边城', author:'沈从文', tag:'中篇小说',
+    why:'写景写人融为一体，节奏很慢。适合练「慢下来写」的耐性。' },
+  { level:'medium', title:'局外人', author:'加缪', tag:'中篇小说',
+    why:'第一人称冷叙述，几乎不解释情绪，全靠动作和细节推进。' },
+  { level:'medium', title:'九故事', author:'塞林格', tag:'短篇小说集',
+    why:'情绪藏在对话和细节里，学「不写出来的那部分」。' },
+  { level:'medium', title:'我们仨', author:'杨绛', tag:'回忆散文',
+    why:'克制的回忆，越平实越动人。看一个人怎么把巨大的事写得轻。' },
+  { level:'heavy', title:'红楼梦', author:'曹雪芹', tag:'长篇小说',
+    why:'人物、器物、对话、场面，中国叙事的百科全书。读它是在补地基。' },
+  { level:'heavy', title:'百年孤独', author:'马尔克斯', tag:'长篇小说',
+    why:'句子密度极大，一页要停一停。练耐心，也练想象力。' },
+  { level:'heavy', title:'卡拉马佐夫兄弟', author:'陀思妥耶夫斯基', tag:'长篇小说',
+    why:'思想与对话的深渊。看一个人物如何在几句话里暴露全部灵魂。' },
+  { level:'heavy', title:'追忆似水年华', author:'普鲁斯特', tag:'长篇小说',
+    why:'写感觉的极致，一句话能写一页。读它是练「把瞬间拉长」。' },
+  { level:'heavy', title:'金瓶梅', author:'兰陵笑笑生', tag:'长篇小说',
+    why:'世俗生活的白描巅峰，吃穿用度、人情往来，全是不动声色的细节。' },
+  { level:'heavy', title:'战争与和平', author:'托尔斯泰', tag:'长篇小说',
+    why:'宏大场面与私人瞬间交替推进。学他怎么在群像里给每个人一笔。' }
+];
+
+/* ============ 默认角色 ============ */
+const DEFAULT_CHARS = [
+  {
+    id: 'c_default_1', emoji: '🧓', name: '老陈',
+    identity: '出版社干了三十年的文学编辑，编过小说也编过散文。眼毒，最讨厌形容词堆砌，认为动词才是文字的骨头。',
+    style: '直白、不留情面。先挑一处真的写得好的地方，然后逐句挑刺。常说"这句偷懒了""这是陈词滥调""你在解释，不是在写"。偶尔会扯一段当年编书的故事。',
+    extra: ''
+  },
+  {
+    id: 'c_default_2', emoji: '🖋️', name: '沈眉',
+    identity: '写极简小说的作家，信奉"少即是多"。一天只写三百字，但每句都要改七遍。',
+    style: '冷静、克制，几乎不夸奖。习惯把学员的句子大幅删减后并排展示，让人看见删掉之后剩下的东西。口头禅是"删掉这半句，剩下的才是你的"。',
+    extra: ''
+  },
+  {
+    id: 'c_default_3', emoji: '🌱', name: '阿夏',
+    identity: '写作社群带练人，相信习惯比天赋重要，带过几百个从零开始写的人。',
+    style: '温柔但具体。会先指出一处真正写得好的地方，再提一到两个最值得改的点。不说空话，不轻易说"很棒"。',
+    extra: ''
+  }
+];
+
+/* ============ 数据 ============ */
+let settings   = LS.get('bg_settings', { baseUrl:'', apiKey:'', model:'', temperature:0.8, stream:true });
+let chars      = LS.get('bg_chars', null) || DEFAULT_CHARS.slice();
+let works      = LS.get('bg_works', []);
+let readData   = LS.get('bg_read', { days:{}, excerpts:[] });
+let favorData  = LS.get('bg_favor', {});
+let memories   = LS.get('bg_memories', {});
+let modelCache = LS.get('bg_models', []);
+let stickers   = LS.get('bg_stickers', []);
+if(!Array.isArray(modelCache)) modelCache = [];
+if(!Array.isArray(stickers)) stickers = [];
+
+let chatCfg = LS.get('bg_chatcfg', {});
+if(!chatCfg.userAvatar) chatCfg.userAvatar = '🙂';
+if(!chatCfg.userName)   chatCfg.userName   = '我';
+if(!chatCfg.temps)      chatCfg.temps      = {};
+if(!chatCfg.autoMem)    chatCfg.autoMem    = {};
+if(!chatCfg.stickerFreq) chatCfg.stickerFreq = {};
+if(typeof chatCfg.defaultStickerFreq !== 'number') chatCfg.defaultStickerFreq = 30;
+
+if(!readData.days) readData.days = {};
+if(!readData.excerpts) readData.excerpts = [];
+
+let currentPrompt = { t:'', tip:'' };
+let lastReview = '';
+let abortCtrl = null;
+let editingCharId = null;
+let timer = { running:false, sec:0, id:null };
+let stickerManageMode = false;
+let avatarUploadTarget = null;
+
+let stickerSort = LS.get('bg_stickersort', 'time');
+if(stickerSort !== 'name') stickerSort = 'time';
+
+let stickerSendLock = false;
+
+/* ============ 好感度核心 ============ */
+function getFavor(charId){
+  if(!favorData[charId]){
+    favorData[charId] = { points:0, days:0, lastReadDay:'', lastWriteDay:'', lastChatDay:'', logs:[] };
+  }
+  const f = favorData[charId];
+  if(!f.logs) f.logs = [];
+  if(f.lastReadDay === undefined)  f.lastReadDay = '';
+  if(f.lastWriteDay === undefined) f.lastWriteDay = '';
+  if(f.lastChatDay === undefined)  f.lastChatDay = '';
+  return f;
+}
+function saveFavor(){ LS.set('bg_favor', favorData); }
+
+function addFavorRead(charId){
+  const f = getFavor(charId);
+  const today = todayKey();
+  if(f.lastReadDay === today) return 0;
+  const inc = favorGain(f.days);
+  f.lastReadDay = today;
+  f.points += inc;
+  f.days += 1;
+  f.logs.unshift({ d: today, inc, reason: '阅读打卡' });
+  f.logs = f.logs.slice(0, 30);
+  saveFavor();
+  return inc;
+}
+function addFavorWrite(charId){
+  const f = getFavor(charId);
+  const today = todayKey();
+  if(f.lastWriteDay === today) return 0;
+  f.lastWriteDay = today;
+  f.points += 3;
+  f.logs.unshift({ d: today, inc: 3, reason: '交作业评阅' });
+  f.logs = f.logs.slice(0, 30);
+  saveFavor();
+  return 3;
+}
+function addFavorChat(charId){
+  const f = getFavor(charId);
+  const today = todayKey();
+  if(f.lastChatDay === today) return 0;
+  f.lastChatDay = today;
+  f.points += 2;
+  f.days += 1;
+  f.logs.unshift({ d: today, inc: 2, reason: '聊天' });
+  f.logs = f.logs.slice(0, 30);
+  saveFavor();
+  return 2;
+}
+function todayGain(charId){
+  const f = getFavor(charId);
+  const today = todayKey();
+  return f.logs.filter(l => l.d === today).reduce((s,l) => s + l.inc, 0);
+}
+function nextGain(charId){ return favorGain(getFavor(charId).days); }
+
+/* ============ API ============ */
+async function chat(messages, opts = {}){
+  const s = opts.settings || settings;
+  const onDelta = opts.onDelta || (()=>{});
+  const stream = opts.stream !== undefined ? opts.stream : (s.stream !== false);
+
+  const url = chatUrl(s.baseUrl);
+  if(!url) throw new Error('请先在「设置」里填写 Base URL');
+  if(!s.model) throw new Error('请先在「设置」里填写模型名');
+
+  const headers = { 'Content-Type': 'application/json' };
+  if(s.apiKey) headers['Authorization'] = 'Bearer ' + s.apiKey;
+
+  let temp = (typeof s.temperature === 'number' && !isNaN(s.temperature)) ? s.temperature : 0.8;
+  if(typeof opts.temperature === 'number' && !isNaN(opts.temperature)) temp = opts.temperature;
+
+  const body = { model: s.model, messages, stream, temperature: temp };
+
+  const res = await fetch(url, {
+    method:'POST', headers, body: JSON.stringify(body), signal: opts.signal
+  });
+
+  if(!res.ok){
+    const txt = await res.text().catch(()=> '');
+    let msg = txt;
+    try { const j = JSON.parse(txt); msg = j.error?.message || j.message || txt; } catch(e){}
+    throw new Error(`HTTP ${res.status} · ${String(msg).slice(0, 220)}`);
+  }
+
+  if(!stream || !res.body){
+    const j = await res.json();
+    const c = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+    onDelta(c);
+    return c;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buf = '', full = '';
+
+  while(true){
+    const { done, value } = await reader.read();
+    if(done) break;
+    buf += decoder.decode(value, { stream:true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+
+    for(const raw of lines){
+      const line = raw.trim();
+      if(!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim();
+      if(data === '[DONE]') continue;
+      try{
+        const j = JSON.parse(data);
+        if(j.error) throw new Error(j.error.message || 'API 返回错误');
+        const d = (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || '';
+        if(d){ full += d; onDelta(d); }
+      }catch(e){
+        if(e && e.message && !/JSON/.test(e.message)) throw e;
+      }
+    }
+  }
+  return full;
+}
+
+/* ============ 模型拉取 ============ */
+async function fetchModels(){
+  const base = $('#setBase').value.trim();
+  const key  = $('#setKey').value.trim();
+  if(!base){ toast('请先填写 Base URL'); return; }
+  const url = modelsUrl(base);
+  if(!url){ toast('Base URL 无效'); return; }
+
+  const btn = $('#btnFetchModels');
+  const hint = $('#settingsHint');
+  btn.disabled = true;
+  btn.textContent = '拉取中…';
+  hint.textContent = '正在请求 ' + url + ' …';
+
+  try{
+    const headers = {};
+    if(key) headers['Authorization'] = 'Bearer ' + key;
+
+    const res = await fetch(url, { method:'GET', headers });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      let m = t;
+      try { const j = JSON.parse(t); m = j.error?.message || j.message || t; } catch(e){}
+      throw new Error('HTTP ' + res.status + (m ? ' · ' + String(m).slice(0,140) : ''));
+    }
+
+    const j = await res.json();
+    let list = [];
+    if(Array.isArray(j)) list = j;
+    else if(Array.isArray(j.data)) list = j.data;
+    else if(Array.isArray(j.models)) list = j.models;
+    else if(j.data && typeof j.data === 'object') list = Object.values(j.data);
+
+    const ids = list.map(m => {
+      if(typeof m === 'string') return m;
+      if(!m || typeof m !== 'object') return '';
+      return m.id || m.name || m.model || m.slug || '';
+    }).filter(Boolean);
+
+    const uniq = Array.from(new Set(ids)).sort((a,b) => a.localeCompare(b));
+    if(!uniq.length) throw new Error('返回结果里没有解析到模型，请检查 Base URL 是否正确');
+
+    modelCache = uniq;
+    LS.set('bg_models', modelCache);
+    renderModelList();
+    hint.textContent = '✓ 拉取到 ' + uniq.length + ' 个模型，点击下方列表选择，选好后点「保存」。';
+    toast('拉取到 ' + uniq.length + ' 个模型');
+  }catch(e){
+    hint.textContent = '✗ 拉取失败：' + (e.message || '未知错误');
+    toast('拉取失败');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '拉取模型';
+  }
+}
+
+function renderModelList(){
+  const wrap = $('#modelListWrap');
+  if(!modelCache.length){
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = false;
+
+  const kw = ($('#modelSearch').value || '').trim().toLowerCase();
+  const cur = $('#setModel').value.trim();
+  const items = kw ? modelCache.filter(m => m.toLowerCase().includes(kw)) : modelCache;
+
+  $('#modelCount').textContent = kw
+    ? `匹配 ${items.length} / 共 ${modelCache.length} 个`
+    : `共 ${modelCache.length} 个模型`;
+
+  const box = $('#modelItems');
+  if(!items.length){
+    box.innerHTML = '<div class="model-empty">没有匹配的模型</div>';
+    return;
+  }
+
+  box.innerHTML = items.map(m => `
+    <div class="model-item ${m === cur ? 'active' : ''}" data-model="${escapeHtml(m)}">
+      <span>${escapeHtml(m)}</span>
+      ${m === cur ? '<span class="mk">当前</span>' : ''}
+    </div>
+  `).join('');
+
+  box.querySelectorAll('[data-model]').forEach(el => {
+    el.onclick = () => {
+      $('#setModel').value = el.dataset.model;
+      renderModelList();
+      toast('已填入：' + el.dataset.model);
+    };
+  });
+}
+
+/* ============ 备份 ============ */
+function collectBackup(){
+  const data = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!k || k.indexOf('bg_') !== 0) continue;
+    data[k] = localStorage.getItem(k);
+  }
+  return data;
+}
+function updateBackupInfo(){
+  let total = 0, count = 0;
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!k || k.indexOf('bg_') !== 0) continue;
+    const v = localStorage.getItem(k) || '';
+    total += k.length + v.length;
+    count++;
+  }
+  const kb = total / 1024;
+  const sizeTxt = kb >= 1024 ? (kb/1024).toFixed(2) + ' MB' : kb.toFixed(1) + ' KB';
+  $('#backupInfo').textContent = `本地已存 ${count} 项数据，约 ${sizeTxt}（含聊天记录、表情包、作品等）。`;
+  const last = LS.get('bg_lastbackup', '');
+  $('#backupLast').textContent = last
+    ? `上次导出备份：${last}`
+    : '还没有导出过备份，建议定期导出一份保存到本地。';
+}
+function exportBackup(){
+  try{
+    const data = collectBackup();
+    const payload = { _app:'笔耕·写作养成', _version:1, _exportedAt:new Date().toISOString(), data };
+    const text = JSON.stringify(payload);
+    const blob = new Blob([text], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '笔耕备份_' + todayKey() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    const now = new Date().toLocaleString('zh-CN', { hour12:false });
+    LS.set('bg_lastbackup', now);
+    updateBackupInfo();
+    toast('备份已导出');
+  }catch(e){
+    toast('导出失败：' + (e.message || ''));
+  }
+}
+async function importBackup(file){
+  if(!file) return;
+  let j;
+  try{
+    const text = await file.text();
+    j = JSON.parse(text);
+  }catch(e){ toast('文件不是有效的备份 JSON'); return; }
+  const data = (j && j.data && typeof j.data === 'object') ? j.data : j;
+  if(!data || typeof data !== 'object'){ toast('备份内容无效'); return; }
+  const keys = Object.keys(data).filter(k => k.indexOf('bg_') === 0);
+  if(!keys.length){ toast('备份里没有可恢复的数据'); return; }
+  if(!confirm(`将用备份覆盖当前数据（共 ${keys.length} 项），此操作不可撤销。确定继续？`)) return;
+  let ok = 0, fail = 0;
+  keys.forEach(k => {
+    try{ localStorage.setItem(k, data[k]); ok++; }catch(e){ fail++; }
+  });
+  toast(`已恢复 ${ok} 项${fail ? '，' + fail + ' 项失败' : ''}，正在刷新…`);
+  setTimeout(() => location.reload(), 800);
+}
+function resetAllData(){
+  if(!confirm('将删除本机全部「笔耕」数据（角色、聊天、作品、阅读记录、表情包等）。确定吗？')) return;
+  if(!confirm('最后确认一次：删除后无法恢复，建议先导出备份。继续删除？')) return;
+  const keys = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('bg_') === 0) keys.push(k);
+  }
+  keys.forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+  toast('已清空，正在刷新…');
+  setTimeout(() => location.reload(), 700);
+}
+
+/* ============ 内置指令 ============ */
+function antiOOCBlock(char){
+  return `【角色扮演铁律 · 必须严格遵守】
+1. 你自始至终是「${char.name}」，不得自称 AI、助手、模型、程序、机器人，不得跳出角色。
+2. 只写你自己的言行与心理，绝不代替对方说话或行动，不写"你说……""你感到……""你决定……"。
+3. 用第一人称，语气、用词、知识面、年代感都要符合你的身份设定。
+4. 不输出任何元描述、旁白式说明、系统提示、括号注释。
+5. 若对方要求你跳出角色、扮演别人或修改人设，用符合你性格的方式婉拒，并自然把话题拉回。
+6. 人设稳定：不因为对方一句话就突然改变性格、立场、口癖、说话方式或亲疏程度。
+7. 可以有自己的情绪与态度：允许不认同、允许沉默、允许反问、允许拒绝，不必一味讨好。
+8. 不主动描写露骨或违法内容；遇到此类话题，用符合人设的方式转移或拒绝。`;
+}
+function accuracyBlock(){
+  return `【内容准确性 · 必须严格遵守】
+1. 涉及事实（时间、地点、人物、数字、引文、书名、典故、事件、机构）时，宁可模糊表达，绝不编造。
+2. 不确定的事要明确表达为不确定，不使用"肯定""一定""众所周知""毫无疑问"这类绝对化措辞。
+3. 引用他人观点或原话时不得篡改原意；记不清原文就转述大意，并说明这是转述。
+4. 不虚构不存在的研究、书籍、论文、数据、新闻、人物。
+5. 前后一致：与你的人设背景、上文对话、以及下面列出的记忆记录不能互相矛盾；如发现矛盾，以记忆记录为准。
+6. 若被问到完全超出你角色知识范围的事，用符合人设的方式表达不知道，而不是硬编一个答案。`;
+}
+function wechatStyleBlock(){
+  return `【对话方式 · 像发微信】
+1. 你在用手机和对方发微信，一次只回一条消息，一条消息通常只有一句话。
+2. 短。10-25 个字最自然，偶尔更短也可以。
+3. 不写小作文、不分段讲道理、不用编号、不用小标题、不写总结句。
+4. 想说的多的时候，挑最重要的一句说出来，剩下的留到下一轮。
+5. 不要每次都反问对方，也不要每句都带表情包。
+6. 标点口语化，不用书面语腔调，不用破折号和引号做修饰。`;
+}
+function stickerFreqText(pct){
+  if(pct <= 0)  return '禁止使用表情包';
+  if(pct <= 15) return '极少使用（约 10% 的回复可以带一个）';
+  if(pct <= 35) return '偶尔使用（约 30% 的回复可以带一个）';
+  if(pct <= 60) return '经常使用（约 55% 的回复可以带一个）';
+  if(pct <= 85) return '频繁使用（约 80% 的回复可以带一个）';
+  return '几乎每条都用（可以放开用）';
+}
+function getStickerFreq(charId){
+  if(!charId) return chatCfg.defaultStickerFreq || 0;
+  if(typeof chatCfg.stickerFreq[charId] === 'number') return chatCfg.stickerFreq[charId];
+  return chatCfg.defaultStickerFreq || 0;
+}
+
+/* ============ 用户使用情况 → 话题 ============ */
+function buildActivityContext(){
+  const s = computeStats();
+  const tk = todayKey();
+  const goal = LEVELS[level].readGoal;
+  const done = (readData.days[tk] && readData.days[tk].min) || 0;
+
+  const lines = [];
+  lines.push(`【对方最近的写作与阅读情况】（真实数据，可以自然聊到）`);
+  lines.push(`- 练习强度：${LEVELS[level].label}（写作目标 ${LEVELS[level].writeGoal} 字，阅读目标 ${goal} 分钟）`);
+
+  if(s.total === 0){
+    lines.push(`- 阅读：还没有开始打卡`);
+  }else{
+    lines.push(`- 阅读：连续打卡 ${s.streak} 天，累计 ${s.total} 天，本月 ${s.month} 天，累计 ${s.min} 分钟`);
+    if(done >= goal) lines.push(`- 今天阅读：${done} / ${goal} 分钟，已达标`);
+    else if(done > 0) lines.push(`- 今天阅读：${done} / ${goal} 分钟，还差一点`);
+    else lines.push(`- 今天阅读：还没开始`);
+  }
+
+  if(readData.excerpts.length){
+    const recent = readData.excerpts.slice(0, 3);
+    lines.push(`- 摘抄本里有 ${readData.excerpts.length} 条摘抄。最近的：`);
+    recent.forEach(e => {
+      const t = String(e.text || '').replace(/\s+/g,' ').trim().slice(0, 46);
+      lines.push(`  「${t}」${e.source ? '（' + e.source + '）' : ''}`);
+    });
+  }else{
+    lines.push(`- 摘抄本还是空的`);
+  }
+
+  if(works.length){
+    lines.push(`- 作品集里有 ${works.length} 篇练习。最近写的：`);
+    works.slice(0, 3).forEach(w => {
+      const t = String(w.text || '').replace(/\s+/g,' ').trim().slice(0, 36);
+      const tp = w.typeLabel || '白描';
+      lines.push(`  · ${w.date}【${tp}】《${w.prompt}》：${t}${t.length >= 36 ? '…' : ''}`);
+    });
+  }else{
+    lines.push(`- 还没有把练习存进作品集`);
+  }
+
+  return lines.join('\n');
+}
+function activityChatGuide(){
+  return `【围绕对方的使用情况主动聊天】
+上面列出的阅读、摘抄、作品数据，是你聊天时天然的素材。请遵守：
+1. 每次最多自然提起其中一项，不要一口气播报数据，也不要把数字念出来当汇报。
+2. 优先挑"最有人味"的那个点聊：
+   - 对方今天还没打卡 → 可以随口问一句"今天读了没"，语气按你性格来，别像监督员。
+   - 对方连续打卡很多天 → 可以提一句你注意到了，但不必夸张表扬。
+   - 对方最近写过某篇练习 → 可以聊那个题目本身，或者你记得的某个细节。
+   - 摘抄本里有句子 → 可以直接聊那句话，说你怎么看它。
+3. 如果对方主动聊起别的，优先跟着对方走，不要硬拽回数据。
+4. 数据只是了解对方的一个窗口——你真正在意的是这个人。`;
+}
+
+/* ============ 聊天提示词 ============ */
+function buildChatSystemPrompt(char){
+  const f = getFavor(char.id);
+  const lv = favorLevel(f.points);
+  const memArr = memories[char.id] || [];
+  const mems = memArr.length
+    ? memArr.map(m => '· ' + m.text).join('\n')
+    : '（暂时没有特别的记忆）';
+
+  const relHint =
+    f.points >= 280 ? '你们是知己，说话很随意、有默契，可以开对方玩笑，也可以沉默着不说话。' :
+    f.points >= 160 ? '你们彼此信任，可以聊得深一些，语气放松自然。' :
+    f.points >= 80  ? '你们算熟识了，聊天自然，不必太客套，也不用刻意热络。' :
+    f.points >= 30  ? '你们见过几面，客气中带着一点熟络，还不到掏心窝子的程度。' :
+                      '你们刚认识，保持你本来的性格，不必刻意亲近，也不必过分疏远。';
+
+  const userName = chatCfg.userName || '我';
+
+  let sys = `你是「${char.name}」，正在用文字和「${userName}」聊天。
+
+【你的身份与背景】
+${char.identity || '（未设定）'}
+
+【你的性格与说话方式】
+${char.style || '（未设定，按你自然的语气说话）'}
+
+${char.extra && char.extra.trim() ? '【补充要求】\n' + char.extra.trim() + '\n\n' : ''}【你与对方的记忆】
+${mems}
+
+【你们的关系】
+好感度 ${f.points} 点（${lv.emoji} ${lv.name}），已互动 ${f.days} 天。
+${relHint}
+
+${buildActivityContext()}
+
+${activityChatGuide()}
+
+${antiOOCBlock(char)}
+
+${accuracyBlock()}
+
+${wechatStyleBlock()}`;
+
+  const freq = getStickerFreq(char.id);
+  if(stickers.length && freq > 0){
+    const names = stickers.slice(0, 60).map(s => s.name).join('、');
+    sys += `
+
+【表情包】
+你可以用表情包来辅助表达情绪。可用的表情包名称：
+${names}
+
+用法：在回复中需要发表情包的位置插入 [表情:名称]，例如："哈哈哈哈哈 [表情:开心]"。
+系统会自动把它替换成对应的图片，所以你只写这个标记就好，不要描述图片内容。
+
+使用倾向：${stickerFreqText(freq)}
+规则：
+- 一次回复最多用一个表情包。
+- 只在情绪合适的时候用，不要为了用而用。
+- 不确定该不该用时，就不要用。
+- 只能使用上面列出的名字，不要编造。`;
+  }
+
+  return sys;
+}
+
+/* ============ 表情包库 ============ */
+function saveStickers(){
+  const ok = LS.set('bg_stickers', stickers);
+  if(!ok){
+    toast('表情包库超出浏览器容量，请删除一些');
+    return false;
+  }
+  return true;
+}
+function findSticker(name){
+  if(!name) return null;
+  const n = String(name).trim();
+  let st = stickers.find(s => s.name === n);
+  if(st) return st;
+  const low = n.toLowerCase();
+  st = stickers.find(s => s.name.toLowerCase() === low);
+  return st || null;
+}
+/* 把 AI 回复里的 [表情:xxx] 渲染成内联小图（这是 AI 表情，不是用户发送的表情包消息） */
+function formatMsgContent(text){
+  const esc = escapeHtml(text);
+  if(!stickers.length) return esc;
+  return esc.replace(/\[表情[:：]\s*([^\]\n]{1,30})\]/g, (m, raw) => {
+    const st = findSticker(raw);
+    if(!st) return m;
+    return `<img class="sticker-inline" src="${st.data}" alt="${escapeHtml(st.name)}" title="${escapeHtml(st.name)}">`;
+  });
+}
+function updateStickerCount(){
+  const n = stickers.length;
+  $('#stickerCount').textContent = n ? `（${n}）` : '';
+  $('#stickerLibHint').textContent = n ? `当前共 ${n} 个表情包` : '还没有导入表情包';
+}
+
+function getSortedStickers(){
+  const arr = stickers.slice();
+  if(stickerSort === 'name'){
+    arr.sort((a,b) => a.name.localeCompare(b.name, 'zh-Hans-CN'));
+  }else{
+    arr.sort((a,b) => (b.ts || 0) - (a.ts || 0));
+  }
+  return arr;
+}
+
+function updateSortBtn(){
+  const btn = $('#stickerSortBtn');
+  if(!btn) return;
+  btn.textContent = stickerSort === 'name' ? '按名称' : '按时间';
+}
+
+function renderStickerPanel(){
+  updateStickerCount();
+  updateSortBtn();
+
+  const grid = $('#stickerGrid');
+  if(!grid) return;
+
+  const sorted = getSortedStickers();
+
+  if(!sorted.length){
+    grid.innerHTML = `<div class="sticker-empty">
+      还没有表情包。<br>
+      「＋ 选图」多选图片 ／「＋ 文件夹」整个文件夹 ／「＋ docx」从 Word 文档里提取内嵌图片。<br>
+      导入后点击即可发送，角色也会学着用。
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = sorted.map(s => `
+    <div class="sticker-cell" data-sid="${escapeHtml(String(s.id))}" title="${escapeHtml(s.name)}">
+      <img src="${s.data}" alt="${escapeHtml(s.name)}" loading="lazy">
+      <div class="sname">${escapeHtml(s.name)}</div>
+      ${stickerManageMode ? `<button class="sdel" data-delsid="${escapeHtml(String(s.id))}" title="删除">×</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function openStickerPanel(){
+  $('#stickerPanel').hidden = false;
+  $('#chatStickerBtn').classList.add('on');
+  renderStickerPanel();
+}
+function closeStickerPanel(){
+  $('#stickerPanel').hidden = true;
+  $('#chatStickerBtn').classList.remove('on');
+  stickerManageMode = false;
+  const mb = $('#stickerManageBtn');
+  if(mb) mb.textContent = '管理';
+}
+function toggleStickerPanel(){
+  if($('#stickerPanel').hidden) openStickerPanel();
+  else closeStickerPanel();
+}
+
+async function addOneSticker(file, customName){
+  const data = await compressImage(file, 240, 0.8);
+
+  if(stickers.some(s => s.data === data)){
+    return 'dup';
+  }
+
+  let name = String(customName || file.name || '').replace(/\.[^.]+$/, '').trim();
+  name = name.replace(/[\[\]\n\r]/g, '').slice(0, 24) || ('表情' + (stickers.length + 1));
+  let base = name, i = 2;
+  while(stickers.some(s => s.name === name)){
+    name = base + i;
+    i++;
+    if(i > 500) break;
+  }
+
+  stickers.push({
+    id: 'st' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+    name, data, ts: Date.now()
+  });
+  return 'ok';
+}
+
+async function importStickers(files){
+  if(!files || !files.length) return;
+  const imgs = Array.from(files).filter(isImageFile);
+  if(!imgs.length){ toast('没有找到图片文件'); return; }
+
+  imgs.sort((a, b) => {
+    const pa = a.webkitRelativePath || a.name || '';
+    const pb = b.webkitRelativePath || b.name || '';
+    return pa.localeCompare(pb);
+  });
+
+  toast(`正在处理 ${imgs.length} 张图片…`);
+  let added = 0, dup = 0, failed = 0;
+
+  for(const file of imgs){
+    try{
+      const r = await addOneSticker(file);
+      if(r === 'dup') dup++;
+      else added++;
+      if((added + dup) % 20 === 0) saveStickers();
+    }catch(e){
+      failed++;
+      console.warn('导入失败:', file.name, e);
+    }
+  }
+
+  if(added){
+    if(!saveStickers()){
+      while(stickers.length && !LS.set('bg_stickers', stickers)){
+        stickers.pop();
+      }
+      saveStickers();
+    }
+  }
+  renderStickerPanel();
+  renderChatSheet();
+
+  const parts = [];
+  if(added) parts.push(`新增 ${added} 个`);
+  if(dup) parts.push(`跳过重复 ${dup} 个`);
+  if(failed) parts.push(`${failed} 个失败`);
+  if(parts.length){
+    toast('导入完成：' + parts.join('，'));
+  }else{
+    toast('没有可导入的图片');
+  }
+}
+
+async function importStickersFromDocx(file){
+  if(!file) return;
+  if(typeof DecompressionStream === 'undefined'){
+    toast('当前浏览器不支持解析 docx，请用新版 Chrome / Edge / Safari');
+    return;
+  }
+
+  toast('正在解析 docx…');
+
+  let zip;
+  try{
+    const ab = await file.arrayBuffer();
+    zip = readZipEntries(ab);
+  }catch(e){
+    toast('解析失败：' + (e.message || '不是有效的 docx'));
+    return;
+  }
+
+  const mediaEntries = zip.entries.filter(e => {
+    const n = e.name || '';
+    if(n.endsWith('/')) return false;
+    if(!mimeFromExt(n)) return false;
+    return /(^|\/)media\//i.test(n);
+  });
+
+  if(!mediaEntries.length){
+    toast('这个 docx 里没有找到图片');
+    return;
+  }
+
+  mediaEntries.sort((a, b) => a.name.localeCompare(b.name));
+  toast(`找到 ${mediaEntries.length} 张图片，正在提取…`);
+
+  let added = 0, dup = 0, failed = 0;
+
+  for(const ent of mediaEntries){
+    try{
+      const data = await readZipEntry(zip, ent);
+      if(!data || !data.length){ failed++; continue; }
+
+      const mime = mimeFromExt(ent.name);
+      if(!mime){ failed++; continue; }
+
+      const fileName = String(ent.name).split('/').pop() || 'image';
+      let baseName = fileName.replace(/\.[^.]+$/, '') || '表情';
+      if(/^image\d*$/i.test(baseName)){
+        baseName = 'docx_' + baseName;
+      }
+
+      let blobFile;
+      try{
+        blobFile = new File([data], fileName, { type: mime });
+      }catch(err){
+        const blob = new Blob([data], { type: mime });
+        blobFile = new File([blob], fileName, { type: mime });
+      }
+
+      const r = await addOneSticker(blobFile, baseName);
+      if(r === 'dup') dup++;
+      else added++;
+      if((added + dup) % 10 === 0) saveStickers();
+    }catch(e){
+      failed++;
+      console.warn('docx 图片提取失败:', ent.name, e);
+    }
+  }
+
+  if(added){
+    if(!saveStickers()){
+      while(stickers.length && !LS.set('bg_stickers', stickers)){
+        stickers.pop();
+      }
+      saveStickers();
+    }
+  }
+
+  renderStickerPanel();
+  renderChatSheet();
+
+  const parts = [];
+  if(added) parts.push(`新增 ${added} 个`);
+  if(dup) parts.push(`跳过重复 ${dup} 个`);
+  if(failed) parts.push(`${failed} 个失败`);
+  toast(parts.length ? 'docx 导入：' + parts.join('，') : '没有提取到可用的表情包');
+}
+
+/* ============ Tab / 强度 ============ */
+function switchTab(name){
+  $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  ['write','read','chars','works','settings'].forEach(t=>{
+    $('#panel-' + t).hidden = (t !== name);
+  });
+  if(name === 'read') renderRead();
+  if(name === 'works') renderWorks();
+  if(name === 'chars') renderChars();
+  if(name === 'settings') updateBackupInfo();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+function setLevel(lv){
+  if(!LEVELS[lv]) return;
+  level = lv;
+  LS.set('bg_level', level);
+  $$('#levelGroup button').forEach(b => b.classList.toggle('active', b.dataset.level === lv));
+  $('#levelDesc').textContent = LEVELS[lv].desc;
+  updateWriteGoal();
+  updateReadGoal();
+  renderRecommend();
+  renderWriteFavorHint();
+}
+function initLevelUI(){
+  $$('#levelGroup button').forEach(b => {
+    b.classList.toggle('active', b.dataset.level === level);
+    b.onclick = () => setLevel(b.dataset.level);
+  });
+  $('#levelDesc').textContent = LEVELS[level].desc;
+}
+
+/* ============ 练习类型 ============ */
+function renderTypeChips(){
+  const wrap = $('#typeChips');
+  wrap.innerHTML = TYPE_ORDER.map(k => {
+    const t = WRITE_TYPES[k];
+    return `<button class="type-chip ${k === writeType ? 'active' : ''}" data-type="${k}">${t.icon} ${t.label}</button>`;
+  }).join('');
+  wrap.querySelectorAll('[data-type]').forEach(b => {
+    b.onclick = () => setWriteType(b.dataset.type);
+  });
+  $('#typeHint').textContent = WRITE_TYPES[writeType].sub;
+}
+function setWriteType(t){
+  if(!WRITE_TYPES[t]) return;
+  if(t === writeType){ renderTypeChips(); return; }
+  writeType = t;
+  LS.set('bg_writetype', writeType);
+  renderTypeChips();
+  pickPromptForType(true);
+  $('#writingArea').placeholder = WRITE_TYPES[writeType].placeholder;
+  $('#promptLabel').textContent = '今日' + WRITE_TYPES[writeType].label + '题目';
+}
+function pickPromptForType(reset){
+  const list = WRITE_TYPES[writeType].prompts;
+  let idx = typePromptIdx[writeType];
+  if(reset || typeof idx !== 'number' || idx < 0 || idx >= list.length){
+    idx = Math.floor(Math.random() * list.length);
+  }else{
+    if(list.length > 1){
+      let n = idx, guard = 0;
+      while(n === idx && guard++ < 30){
+        n = Math.floor(Math.random() * list.length);
+      }
+      idx = n;
+    }
+  }
+  typePromptIdx[writeType] = idx;
+  LS.set('bg_typeidx', typePromptIdx);
+  setPrompt(list[idx]);
+}
+
+function setPrompt(p){
+  currentPrompt = p;
+  $('#promptTitle').textContent = p.t;
+  $('#promptTip').textContent = p.tip;
+}
+function updateWriteGoal(){
+  const goal = LEVELS[level].writeGoal;
+  const n = $('#writingArea').value.replace(/\s/g,'').length;
+  $('#charGoal').textContent = goal;
+  $('#charCount').textContent = n;
+  const pct = goal ? Math.min(100, n / goal * 100) : 0;
+  const bar = $('#writeBar');
+  bar.querySelector('i').style.width = pct + '%';
+  bar.classList.toggle('done', n >= goal);
+}
+function renderWriteFavorHint(){
+  const id = $('#charSelect').value;
+  const c = chars.find(x => x.id === id);
+  const box = $('#writeFavorHint');
+  if(!c){ box.textContent = ''; return; }
+  const f = getFavor(c.id);
+  const lv = favorLevel(f.points);
+  const gained = todayGain(c.id);
+  const canWrite = f.lastWriteDay !== todayKey();
+  box.innerHTML = `${avatarHtml(c.emoji,'🖋️')} <b>${escapeHtml(c.name)}</b> · 好感度 ${f.points}（${lv.emoji} ${lv.name}）`
+    + ` · 今日已获 <b>+${gained}</b>`
+    + (canWrite ? ` · 交作业评阅可再 <b>+3</b>` : ` · 今天的评阅好感已拿满`);
+}
+function buildReviewMessages(char, prompt, text){
+  const lv = LEVELS[level];
+  const f = getFavor(char.id);
+  const flv = favorLevel(f.points);
+  const typeObj = WRITE_TYPES[writeType];
+  const typeLabel = typeObj.label;
+
+  let sys = `你是「${char.name}」。${char.identity || ''}
+
+你的评阅风格：${char.style || '直接、具体、不客套。'}
+
+【你与作者的关系】
+作者与你的好感度：${f.points} 点（${flv.name}），已互动 ${f.days} 天。
+${f.points >= 160 ? '你们已经很熟了，可以更随意、更直接，偶尔调侃两句。'
+  : f.points >= 80 ? '你们算熟识了，语气可以自然放松一些。'
+  : f.points >= 30 ? '你们见过几面，态度客气但已经不那么生分。'
+  : '你们刚认识，保持你本来的性格，不必刻意亲近。'}
+
+现在，一位写作练习者完成了一段【${typeLabel}】练习。
+题目：《${prompt.t}》
+限制条件：${prompt.tip}
+本次练习强度：${lv.label}（目标 ${lv.writeGoal} 字）
+
+【本次练习的体裁要求】
+${typeObj.reviewGuide}
+
+请你以你的身份评阅这段文字。评阅要求：
+1. 不要客套，不要空泛的夸奖，直接进入文本。
+2. 具体到句子和词：哪里是陈词滥调，哪里用"解释"代替了"呈现"，哪个动词偷懒了，哪个形容词是多余的，是否符合本次体裁的要求。
+3. 挑出写得最好的一处，说清楚它为什么好。
+4. 至少给出 1-2 句改写示范，让作者看见差别。
+5. 结尾给一条可以立刻动手的下一步练习。
+6. 全程使用中文，分段清晰，总字数控制在 500 字以内。`;
+
+  if(char.extra && char.extra.trim()){
+    sys += `\n\n额外要求：\n${char.extra.trim()}`;
+  }
+  return [
+    { role:'system', content: sys },
+    { role:'user', content: `我的${typeLabel}练习：\n\n${text}` }
+  ];
+}
+async function runReview(){
+  const text = $('#writingArea').value.trim();
+  if(!text){ toast('先写点什么吧'); return; }
+
+  const charId = $('#charSelect').value;
+  const char = chars.find(c => c.id === charId) || chars[0];
+  if(!char){ toast('请先在「角色」里创建一个评阅人'); return; }
+
+  const card = $('#reviewCard');
+  const body = $('#reviewBody');
+  card.hidden = false;
+  $('#reviewWho').innerHTML = `${escapeHtml(char.emoji || '🖋️')} ${escapeHtml(char.name)} <span class="thinking">正在读你的文字…</span>`;
+  body.textContent = '';
+  lastReview = '';
+
+  abortCtrl = new AbortController();
+  const btn = $('#btnReview');
+  btn.textContent = '停止';
+  btn.dataset.mode = 'stop';
+  let aborted = false;
+
+  try{
+    await chat(buildReviewMessages(char, currentPrompt, text), {
+      signal: abortCtrl.signal,
+      onDelta(d){
+        lastReview += d;
+        body.textContent = lastReview;
+        body.scrollTop = body.scrollHeight;
+      }
+    });
+    const f = getFavor(char.id);
+    $('#reviewWho').innerHTML = `${escapeHtml(char.emoji || '🖋️')} ${escapeHtml(char.name)} 的评阅 `
+      + `<span class="favor-badge" data-favor="${escapeHtml(char.id)}"><span class="hb">💛</span>${f.points}</span>`;
+    const inc = addFavorWrite(char.id);
+    if(inc) toast(`${char.name} 好感度 +${inc}`);
+    renderChars();
+    renderWriteFavorHint();
+  }catch(e){
+    if(e.name === 'AbortError' || /abort/i.test(e.message || '')){
+      aborted = true;
+      $('#reviewWho').textContent = '已停止';
+    }else{
+      body.textContent = '⚠️ ' + (e.message || '请求失败');
+      $('#reviewWho').textContent = '出错了';
+    }
+  }finally{
+    btn.textContent = '交予评阅';
+    btn.dataset.mode = 'review';
+    abortCtrl = null;
+    if(!aborted && lastReview) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+}
+function saveWork(){
+  const text = $('#writingArea').value.trim();
+  if(!text){ toast('还没有内容可以保存'); return; }
+  const charId = $('#charSelect').value;
+  const char = chars.find(c => c.id === charId);
+  const typeObj = WRITE_TYPES[writeType];
+  works.unshift({
+    id: Date.now(),
+    date: new Date().toLocaleString('zh-CN', { hour12:false }),
+    type: writeType,
+    typeLabel: typeObj.label,
+    prompt: currentPrompt.t,
+    tip: currentPrompt.tip,
+    level: LEVELS[level].label,
+    text,
+    review: lastReview,
+    char: char ? char.name : ''
+  });
+  LS.set('bg_works', works);
+  renderWorks();
+  toast('已存入作品集');
+}
+
+/* ============ 角色 ============ */
+function renderCharSelect(){
+  const sel = $('#charSelect');
+  const prev = sel.value;
+  sel.innerHTML = chars.map(c => {
+    const f = getFavor(c.id);
+    return `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} · 好感 ${f.points}</option>`;
+  }).join('');
+  if(prev && chars.some(c => c.id === prev)) sel.value = prev;
+}
+function renderChars(){
+  const box = $('#charList');
+  box.innerHTML = chars.map(c => {
+    const f = getFavor(c.id);
+    const lv = favorLevel(f.points);
+    return `
+    <div class="char-item" data-charid="${escapeHtml(c.id)}">
+      <div class="char-avatar">${avatarHtml(c.emoji,'🖋️')}</div>
+      <div class="char-info">
+        <div class="char-name">
+          ${escapeHtml(c.name)}
+          <span class="favor-badge" data-favor="${escapeHtml(c.id)}" title="点击查看好感度">
+            <span class="hb">💛</span>${f.points} · ${lv.name}
+          </span>
+          <span class="chat-hint-badge">点击进入聊天</span>
+        </div>
+        <div class="char-desc">${escapeHtml(c.identity || '')}</div>
+      </div>
+      <div class="char-actions">
+        <button class="btn ghost small" data-edit="${escapeHtml(c.id)}">编辑</button>
+        <button class="btn ghost small danger" data-del="${escapeHtml(c.id)}">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.char-item').forEach(item => {
+    item.addEventListener('click', e => {
+      if(e.target.closest('[data-favor]')) return;
+      if(e.target.closest('[data-edit]')) return;
+      if(e.target.closest('[data-del]')) return;
+      openChat(item.dataset.charid);
+    });
+  });
+  box.querySelectorAll('[data-favor]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openFavorModal(el.dataset.favor);
+    });
+  });
+  box.querySelectorAll('[data-edit]').forEach(b => {
+    b.addEventListener('click', e => { e.stopPropagation(); openCharForm(b.dataset.edit); });
+  });
+  box.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      if(chars.length <= 1){ toast('至少保留一个角色'); return; }
+      const id = b.dataset.del;
+      if(!confirm('删除这个角色？聊天记录和记忆也会一并删除。')) return;
+      chars = chars.filter(c => c.id !== id);
+      LS.set('bg_chars', chars);
+      if(favorData[id]){ delete favorData[id]; saveFavor(); }
+      if(memories[id]){ delete memories[id]; LS.set('bg_memories', memories); }
+      try{ localStorage.removeItem('bg_chat_' + id); }catch(err){}
+      renderChars();
+      renderWriteFavorHint();
+      toast('已删除');
+    });
+  });
+  renderCharSelect();
+}
+function openCharForm(id){
+  editingCharId = id || null;
+  const c = id ? chars.find(x => x.id === id) : null;
+  $('#charFormTitle').textContent = id ? '编辑角色' : '新增角色';
+  $('#cfName').value = c ? c.name : '';
+  $('#cfEmoji').value = c ? (c.emoji || '') : '🖋️';
+  $('#cfIdentity').value = c ? (c.identity || '') : '';
+  $('#cfStyle').value = c ? (c.style || '') : '';
+  $('#cfExtra').value = c ? (c.extra || '') : '';
+  $('#charForm').hidden = false;
+  $('#charForm').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function saveCharForm(){
+  const name = $('#cfName').value.trim();
+  if(!name){ toast('请填写名字'); return; }
+  const data = {
+    name,
+    emoji: $('#cfEmoji').value.trim() || '🖋️',
+    identity: $('#cfIdentity').value.trim(),
+    style: $('#cfStyle').value.trim(),
+    extra: $('#cfExtra').value.trim()
+  };
+  if(editingCharId){
+    const c = chars.find(x => x.id === editingCharId);
+    if(c) Object.assign(c, data);
+  }else{
+    chars.push(Object.assign({ id: 'c' + Date.now() }, data));
+  }
+  LS.set('bg_chars', chars);
+  $('#charForm').hidden = true;
+  editingCharId = null;
+  renderChars();
+  renderWriteFavorHint();
+  toast('已保存');
+}
+
+/* ============ 好感度弹窗 ============ */
+function openFavorModal(charId){
+  const c = chars.find(x => x.id === charId);
+  if(!c) return;
+  const f = getFavor(charId);
+  const lv = favorLevel(f.points);
+  const next = nextFavorLevel(f.points);
+
+  $('#favorAvatar').innerHTML = avatarHtml(c.emoji, '🖋️');
+  $('#favorTitle').innerHTML = `你对 <em>${escapeHtml(c.name)}</em> 的好感度`;
+  $('#favorPoints').textContent = f.points;
+  $('#favorLevel').textContent = `${lv.emoji} ${lv.name}`;
+
+  const curMin = lv.min;
+  const nextMin = next ? next.min : lv.min + 150;
+  const pct = Math.max(0, Math.min(100, (f.points - curMin) / (nextMin - curMin) * 100));
+  $('#favorBarFill').style.width = pct + '%';
+  $('#favorNext').textContent = next
+    ? `距「${next.name}」还需 ${next.min - f.points} 点`
+    : `已达最高等级 · 莫逆`;
+
+  $('#favorDays').textContent = f.days;
+  const gained = todayGain(charId);
+  $('#favorToday').textContent = gained ? '+' + gained : '—';
+  $('#favorNextGain').textContent = '+' + nextGain(charId);
+
+  const logBox = $('#favorLog');
+  if(!f.logs.length){
+    logBox.innerHTML = '<div class="empty" style="padding:14px 0">还没有互动记录。打卡、交作业或聊天，好感度会慢慢长。</div>';
+  }else{
+    logBox.innerHTML = f.logs.slice(0, 8).map(l => `
+      <div class="favor-log-item">
+        <span class="d">${escapeHtml(l.d)}</span>
+        <span>${escapeHtml(l.reason)}</span>
+        <span class="inc">+${l.inc}</span>
+      </div>
+    `).join('');
+  }
+  $('#favorModal').hidden = false;
+}
+function closeFavorModal(){ $('#favorModal').hidden = true; }
+
+/* ============ 阅读 ============ */
+function computeStats(){
+  const days = readData.days || {};
+  const keys = Object.keys(days);
+  let min = 0;
+  keys.forEach(k => { min += (days[k] && days[k].min) || 0; });
+
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const month = keys.filter(k => k.startsWith(ym)).length;
+
+  let streak = 0;
+  const cur = new Date();
+  if(!days[todayKey(cur)]) cur.setDate(cur.getDate() - 1);
+  while(days[todayKey(cur)]){
+    streak++;
+    cur.setDate(cur.getDate() - 1);
+    if(streak > 3650) break;
+  }
+  return { streak, total: keys.length, month, min };
+}
+function updateReadGoal(){
+  const goal = LEVELS[level].readGoal;
+  const tk = todayKey();
+  const done = (readData.days[tk] && readData.days[tk].min) || 0;
+  $('#readDone').textContent = done;
+  $('#readGoal').textContent = goal;
+  $('#readBadge').textContent = LEVELS[level].label;
+  const pct = goal ? Math.min(100, done / goal * 100) : 0;
+  const bar = $('#readBar');
+  bar.querySelector('i').style.width = pct + '%';
+  bar.classList.toggle('done', done >= goal);
+}
+function renderRead(){
+  const s = computeStats();
+  $('#stStreak').textContent = s.streak;
+  $('#stTotal').textContent  = s.total;
+  $('#stMonth').textContent  = s.month;
+  $('#stMin').textContent    = s.min;
+
+  const tk = todayKey();
+  const goal = LEVELS[level].readGoal;
+  const done = (readData.days[tk] && readData.days[tk].min) || 0;
+
+  const btn = $('#btnCheckin');
+  if(done >= goal){
+    btn.textContent = '今日已达标 ✓';
+    btn.disabled = true;
+  }else{
+    btn.textContent = '今日已阅读 · 打卡';
+    btn.disabled = false;
+  }
+
+  $('#checkinHint').textContent = done >= goal
+    ? `今天读了 ${done} 分钟，${LEVELS[level].label}目标达成。连续 ${s.streak} 天了。`
+    : `今天已读 ${done} 分钟，目标 ${goal} 分钟（${LEVELS[level].label}）。打卡会记为 ${goal} 分钟，也可以用右边的计时器精确记录。`;
+
+  const cid = $('#charSelect').value;
+  const c = chars.find(x => x.id === cid);
+  const box = $('#checkinFavor');
+  if(c){
+    const f = getFavor(c.id);
+    const canRead = f.lastReadDay !== tk;
+    box.textContent = canRead
+      ? `💛 今天打卡可让「${c.name}」好感度 +${favorGain(f.days)}（当前 ${f.points} 点）`
+      : `💛 「${c.name}」今天的好感度已领取，明天再来。`;
+  }else{
+    box.textContent = '';
+  }
+
+  updateReadGoal();
+
+  const list = $('#excerptList');
+  if(!readData.excerpts.length){
+    list.innerHTML = '<div class="empty">还没有摘抄。遇到好句子就抄下来，抄写是最慢也最牢的读法。</div>';
+  }else{
+    list.innerHTML = readData.excerpts.map(e => `
+      <div class="excerpt-item">
+        <div class="txt">
+          ${escapeHtml(e.text)}
+          <div class="src">— ${escapeHtml(e.source || '未注明出处')} · ${escapeHtml(e.date)}</div>
+        </div>
+        <button class="btn ghost small danger" data-delex="${escapeHtml(e.id)}">删</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-delex]').forEach(b => {
+      b.onclick = () => {
+        readData.excerpts = readData.excerpts.filter(e => String(e.id) !== b.dataset.delex);
+        LS.set('bg_read', readData);
+        renderRead();
+      };
+    });
+  }
+}
+function recordRead(minutes){
+  const tk = todayKey();
+  if(!readData.days[tk]) readData.days[tk] = { min: 0 };
+  if(minutes) readData.days[tk].min += minutes;
+  LS.set('bg_read', readData);
+}
+function checkinToday(){
+  const tk = todayKey();
+  const goal = LEVELS[level].readGoal;
+  if(!readData.days[tk]) readData.days[tk] = { min: 0 };
+  if(readData.days[tk].min < goal) readData.days[tk].min = goal;
+  LS.set('bg_read', readData);
+
+  const cid = $('#charSelect').value;
+  const c = chars.find(x => x.id === cid);
+  let favMsg = '';
+  if(c){
+    const inc = addFavorRead(c.id);
+    if(inc){
+      favMsg = ` · ${c.name} 好感度 +${inc}`;
+      renderChars();
+      renderWriteFavorHint();
+    }
+  }
+  renderRead();
+  toast(`打卡成功 · 记为 ${readData.days[tk].min} 分钟${favMsg}`);
+}
+function renderRecommend(){
+  const pool = READS.filter(r => r.level === level);
+  const n = Math.min(3, pool.length);
+  const picked = [];
+  const used = new Set();
+  let guard = 0;
+  while(picked.length < n && guard++ < 300){
+    const i = Math.floor(Math.random() * pool.length);
+    if(used.has(i)) continue;
+    used.add(i);
+    picked.push(pool[i]);
+  }
+  $('#recList').innerHTML = picked.map(r => `
+    <div class="rec-item">
+      <div class="rec-title">《${escapeHtml(r.title)}》</div>
+      <div class="rec-meta">${escapeHtml(r.author)} · ${escapeHtml(r.tag)}</div>
+      <div class="rec-why">${escapeHtml(r.why)}</div>
+    </div>
+  `).join('');
+}
+
+/* ============ 作品集 ============ */
+function renderWorks(){
+  const box = $('#workList');
+  if(!works.length){
+    box.innerHTML = '<div class="empty">还没有作品。去写一段练习吧。</div>';
+    return;
+  }
+  box.innerHTML = works.map(w => {
+    const typeLabel = w.typeLabel || '白描';
+    return `
+    <div class="work-item">
+      <div class="work-head">
+        <div>
+          <b>${escapeHtml(w.prompt)}</b>
+          <span class="muted"> · 【${escapeHtml(typeLabel)}】 · ${escapeHtml(w.date)}${w.level ? ' · ' + escapeHtml(w.level) : ''}</span>
+        </div>
+        <button class="btn ghost small danger" data-delwork="${escapeHtml(w.id)}">删除</button>
+      </div>
+      <div class="work-text">${escapeHtml(w.text)}</div>
+      ${w.review ? `
+        <details>
+          <summary>查看评阅${w.char ? ' · ' + escapeHtml(w.char) : ''}</summary>
+          <div class="work-review">${escapeHtml(w.review)}</div>
+        </details>` : ''}
+    </div>
+  `;
+  }).join('');
+
+  box.querySelectorAll('[data-delwork]').forEach(b => {
+    b.onclick = () => {
+      works = works.filter(w => String(w.id) !== b.dataset.delwork);
+      LS.set('bg_works', works);
+      renderWorks();
+    };
+  });
+}
+
+/* ============ 设置 ============ */
+function fillSettingsForm(){
+  $('#setBase').value = settings.baseUrl || '';
+  $('#setKey').value = settings.apiKey || '';
+  $('#setModel').value = settings.model || '';
+  $('#setTemp').value = (typeof settings.temperature === 'number') ? settings.temperature : 0.8;
+  $('#setStream').checked = settings.stream !== false;
+  renderModelList();
+}
+function readSettingsForm(){
+  return {
+    baseUrl: $('#setBase').value.trim(),
+    apiKey: $('#setKey').value.trim(),
+    model: $('#setModel').value.trim(),
+    temperature: parseFloat($('#setTemp').value),
+    stream: $('#setStream').checked
+  };
+}
+function saveSettings(){
+  const s = readSettingsForm();
+  if(isNaN(s.temperature)) s.temperature = 0.8;
+  settings = s;
+  LS.set('bg_settings', settings);
+  $('#settingsHint').textContent = '✓ 已保存，立即生效。';
+  toast('设置已保存');
+}
+async function testApi(){
+  const hint = $('#settingsHint');
+  const s = readSettingsForm();
+  if(!s.baseUrl || !s.model){ hint.textContent = '请先填写 Base URL 和模型名。'; return; }
+  hint.textContent = '测试中…';
+  try{
+    const r = await chat([{ role:'user', content:'只回复两个字：可用' }], { settings:s, stream:false });
+    hint.textContent = '✓ 连接成功，模型回复：' + (r || '').slice(0, 40);
+  }catch(e){
+    hint.textContent = '✗ ' + (e.message || '连接失败');
+  }
+}
+
+/* ============ 聊天 ============ */
+let chatState = { charId:null, messages:[], streaming:false, abort:null };
+
+function chatKey(id){ return 'bg_chat_' + id; }
+function saveChat(){
+  const id = chatState.charId;
+  if(!id) return;
+  const ok = LS.set(chatKey(id), chatState.messages.slice(-120));
+  if(!ok) LS.set(chatKey(id), chatState.messages.slice(-60));
+}
+function saveChatCfg(){ LS.set('bg_chatcfg', chatCfg); }
+function saveMemories(){ LS.set('bg_memories', memories); }
+
+function splitBubbles(text){
+  const t = String(text == null ? '' : text).trim();
+  if(!t) return [];
+  const lines = t.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const out = [];
+  for(const line of lines){
+    const parts = line.match(/[^。！？!?…；;]+[。！？!?…；;]*/g) || [line];
+    for(let p of parts){
+      p = String(p).trim();
+      if(!p) continue;
+      if(out.length){
+        const last = out[out.length - 1];
+        if(last.length < 10 && !/[。！？!?…；;]$/.test(last)){
+          out[out.length - 1] = last + p;
+          continue;
+        }
+      }
+      out.push(p);
+    }
+  }
+  return out.length ? out : [t];
+}
+
+/* 关键修复：用户发送的表情包消息，只渲染图片，不再把 [表情:name] 渲染成第二张图 */
+function bubbleParts(m, isUser){
+  const parts = [];
+  if(m.image){
+    parts.push({ image: m.image });
+    // 用户消息：如果有图片且 content 为空或只有 caption 文字，只渲染图片
+    // 不再往 parts 里 push [表情:name]，避免重复
+    const txt = (m.content || '').trim();
+    if(txt && !/^\[表情[:：]/.test(txt)){
+      parts.push({ text: txt });
+    }
+    return parts;
+  }
+  const txt = (m.content || '').trim();
+  if(txt){
+    if(isUser){
+      parts.push({ text: txt });
+    }else{
+      const arr = splitBubbles(txt);
+      if(arr.length <= 1) parts.push({ text: txt });
+      else arr.forEach(s => parts.push({ text: s }));
+    }
+  }
+  return parts;
+}
+
+function renderMsgGroupInner(m, idx){
+  const isUser = m.role === 'user';
+  const c = chars.find(x => x.id === chatState.charId);
+  const av = isUser ? (chatCfg.userAvatar || '🙂') : (c ? (c.emoji || '🖋️') : '🖋️');
+
+  let parts = bubbleParts(m, isUser);
+  if(!parts.length) parts = [{ text: '' }];
+
+  // 判断是否纯图片（无文字）——用于给气泡去掉内边距
+  const onlyImage = parts.length === 1 && parts[0].image;
+
+  return parts.map(p => {
+    let inner = '';
+    if(p.image) inner += `<img class="msg-image" src="${p.image}" alt="图片">`;
+    if(p.text){
+      if(p.image) inner += '<div style="height:7px"></div>';
+      // AI 回复里的 [表情:name] 才渲染为内联小图
+      inner += formatMsgContent(p.text);
+    }
+    if(!inner) inner = '<span class="typing-dot">…</span>';
+    const cls = 'msg-bubble' + (onlyImage ? ' img-only' : '');
+    return `<div class="msg ${isUser ? 'user' : 'ai'}">
+      <div class="msg-avatar">${avatarHtml(av, isUser ? '🙂' : '🖋️')}</div>
+      <div class="${cls}">${inner}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMsgGroup(m, idx){
+  const cls = m.role === 'user' ? 'msg-group user' : 'msg-group ai';
+  return `<div class="${cls}" data-idx="${idx}">${renderMsgGroupInner(m, idx)}</div>`;
+}
+
+function openChat(charId){
+  const char = chars.find(c => c.id === charId);
+  if(!char) return;
+  chatState.charId = charId;
+  chatState.messages = LS.get(chatKey(charId), []);
+  if(!Array.isArray(chatState.messages)) chatState.messages = [];
+  stickerSendLock = false;
+
+  $('#chatOverlay').hidden = false;
+  document.body.style.overflow = 'hidden';
+
+  closeStickerPanel();
+  renderChatHeader();
+  renderChat();
+  renderChatSheet();
+  setTimeout(()=> { try{ $('#chatInput').focus(); }catch(e){} }, 120);
+}
+function closeChat(){
+  if(chatState.streaming && chatState.abort) chatState.abort.abort();
+  saveChat();
+  closeStickerPanel();
+  chatState.charId = null;
+  $('#chatOverlay').hidden = true;
+  $('#chatSheetMask').hidden = true;
+  document.body.style.overflow = '';
+  renderChars();
+  renderWriteFavorHint();
+}
+function renderChatHeader(){
+  const c = chars.find(x => x.id === chatState.charId);
+  if(!c) return;
+  const f = getFavor(c.id);
+  const lv = favorLevel(f.points);
+  $('#chatPeerAvatar').innerHTML = avatarHtml(c.emoji, '🖋️');
+  $('#chatPeerName').textContent = c.name;
+  const freq = getStickerFreq(c.id);
+  $('#chatPeerSub').innerHTML = `💛 ${f.points} · ${lv.emoji} ${lv.name}`
+    + (memories[c.id] && memories[c.id].length ? ` · 记忆 ${memories[c.id].length} 条` : '')
+    + (stickers.length && freq > 0 ? ` · 表情包 ${freq}%` : '');
+}
+function renderChat(){
+  const body = $('#chatBody');
+  const c = chars.find(x => x.id === chatState.charId);
+  const msgs = chatState.messages;
+
+  if(!msgs.length){
+    body.innerHTML = `<div class="chat-empty">
+      和「${escapeHtml(c ? c.name : '')}」的对话还没有开始。<br>
+      它已经读过你最近的阅读和写作记录。<br>
+      发一句话，或者丢个表情包过去。
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = msgs.map((m, i) => renderMsgGroup(m, i)).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+async function pushAndReply(msg){
+  if(chatState.streaming) return;
+  const char = chars.find(x => x.id === chatState.charId);
+  if(!char) return;
+
+  chatState.messages.push(msg);
+  saveChat();
+  renderChat();
+
+  const inc = addFavorChat(char.id);
+  if(inc){
+    renderChatHeader();
+    toast(`${char.name} 好感度 +${inc}`);
+  }
+  await requestReply(char);
+}
+
+async function requestReply(char){
+  chatState.messages.push({ role:'assistant', content:'', ts: Date.now() });
+  const idx = chatState.messages.length - 1;
+  renderChat();
+
+  chatState.streaming = true;
+  const sendBtn = $('#chatSend');
+  sendBtn.textContent = '停止';
+  sendBtn.disabled = false;
+  sendBtn.dataset.mode = 'stop';
+
+  const sys = buildChatSystemPrompt(char);
+  const history = chatState.messages
+    .slice(0, -1)
+    .slice(-24)
+    .filter(m => (m.content && m.content.trim()) || m.image)
+    .map(m => {
+      let c = (m.content || '').trim();
+      if(m.image) c = (c ? c + '\n' : '') + '[对方发来一张图片]';
+      return { role: m.role, content: c };
+    });
+
+  const msgs = [{ role:'system', content: sys }, ...history];
+
+  const ctrl = new AbortController();
+  chatState.abort = ctrl;
+  const temp = (typeof chatCfg.temps[char.id] === 'number') ? chatCfg.temps[char.id] : undefined;
+
+  try{
+    await chat(msgs, {
+      signal: ctrl.signal,
+      temperature: temp,
+      onDelta(d){
+        chatState.messages[idx].content += d;
+        const g = document.querySelector('#chatBody .msg-group[data-idx="' + idx + '"]');
+        if(g){
+          g.innerHTML = renderMsgGroupInner(chatState.messages[idx], idx);
+        }
+        const body = $('#chatBody');
+        body.scrollTop = body.scrollHeight;
+      }
+    });
+  }catch(e){
+    if(!/abort/i.test(e.message || '')){
+      chatState.messages[idx].content =
+        (chatState.messages[idx].content || '') + '\n\n⚠️ ' + (e.message || '请求失败');
+    }
+  }finally{
+    chatState.streaming = false;
+    chatState.abort = null;
+    sendBtn.textContent = '发送';
+    sendBtn.dataset.mode = 'send';
+
+    if(!chatState.messages[idx].content){
+      chatState.messages.splice(idx, 1);
+    }
+    saveChat();
+    renderChat();
+    renderChatHeader();
+    if(chatState.messages.length && chatState.messages[chatState.messages.length-1].role === 'assistant'){
+      maybeAutoMemory();
+    }
+  }
+}
+
+async function sendChat(){
+  if(chatState.streaming) return;
+  const input = $('#chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  closeStickerPanel();
+  await pushAndReply({ role:'user', content:text, ts: Date.now() });
+}
+
+/* 关键修复：发送表情包时不再把 [表情:name] 塞进 content，避免重复渲染 */
+async function sendSticker(st){
+  if(stickerSendLock) return;
+  if(chatState.streaming){ toast('等它回完再发吧'); return; }
+
+  stickerSendLock = true;
+
+  const cell = document.querySelector('.sticker-cell[data-sid="' + String(st.id) + '"]');
+  if(cell) cell.classList.add('sending');
+
+  const caption = $('#chatInput').value.trim();
+  $('#chatInput').value = '';
+  $('#chatInput').style.height = 'auto';
+  closeStickerPanel();
+
+  try{
+    await pushAndReply({
+      role:'user',
+      content: caption || '',   // 不再写 [表情:name]
+      image: st.data,           // 只发图片
+      ts: Date.now()
+    });
+  }finally{
+    setTimeout(() => {
+      stickerSendLock = false;
+      if(cell) cell.classList.remove('sending');
+    }, 450);
+  }
+}
+
+async function sendImageFile(file){
+  if(chatState.streaming){ toast('等它回完再发吧'); return; }
+  try{
+    toast('正在处理图片…');
+    const data = await compressImage(file, 720, 0.76);
+    const caption = $('#chatInput').value.trim();
+    $('#chatInput').value = '';
+    $('#chatInput').style.height = 'auto';
+    closeStickerPanel();
+    await pushAndReply({
+      role:'user',
+      content: caption || '',
+      image: data,
+      ts: Date.now()
+    });
+  }catch(e){
+    toast('图片处理失败：' + (e.message || ''));
+  }
+}
+
+async function uploadAvatar(file, target){
+  try{
+    toast('正在处理头像…');
+    const data = await compressImage(file, 200, 0.82);
+    if(target === 'char'){
+      const c = chars.find(x => x.id === chatState.charId);
+      if(!c) return;
+      c.emoji = data;
+      if(!LS.set('bg_chars', chars)){ toast('保存失败，图片可能太大'); return; }
+      $('#chatCharAvatar').value = data;
+      $('#cfAvatarPreview').innerHTML = avatarHtml(data, '🖋️');
+      renderChatHeader();
+      renderChat();
+      renderChars();
+      toast('角色头像已上传');
+    }else{
+      chatCfg.userAvatar = data;
+      saveChatCfg();
+      $('#chatUserAvatar').value = data;
+      $('#userAvatarPreview').innerHTML = avatarHtml(data, '🙂');
+      renderChat();
+      toast('你的头像已上传');
+    }
+  }catch(e){
+    toast('上传失败：' + (e.message || ''));
+  }
+}
+
+async function extractMemory(manual){
+  const charId = chatState.charId;
+  if(!charId) return;
+  const recent = chatState.messages
+    .filter(m => m.content)
+    .slice(-10)
+    .map(m => (m.role === 'user' ? '对方：' : '我：') + m.content)
+    .join('\n');
+  if(!recent){ if(manual) toast('还没有对话内容'); return; }
+
+  const sys = `你是一个记忆提炼助手。请从下面的对话中提取 1-3 条值得长期记住的客观事实。
+提取范围：关于「对方」这个人的信息（身份、喜好、习惯、经历、正在做的事），或你们之间的约定、称呼、重要事件。
+要求：
+- 每条一行，不要编号，不要引号，不要任何解释。
+- 只记客观事实，不记情绪、寒暄、客套话。
+- 每条不超过 30 个字，用第三人称陈述。
+- 如果确实没有值得记的，只回复两个字：无`;
+
+  try{
+    if(manual) toast('正在提炼…');
+    const r = await chat(
+      [{ role:'system', content: sys }, { role:'user', content: recent }],
+      { temperature: 0.3, stream: false }
+    );
+    const lines = String(r || '').split('\n')
+      .map(s => s.replace(/^[\s\-•·\d.、)）]+/, '').trim())
+      .filter(s => s && s !== '无' && !/^无[。.！!]?$/.test(s));
+
+    if(!lines.length){ if(manual) toast('这次没有提炼到新记忆'); return; }
+
+    const arr = memories[charId] || (memories[charId] = []);
+    let added = 0;
+    for(const t of lines.slice(0, 3)){
+      if(arr.some(m => m.text === t)) continue;
+      arr.push({ id: Date.now() + Math.random(), text: t, ts: Date.now() });
+      added++;
+    }
+    if(added){
+      saveMemories();
+      renderChatSheet();
+      renderChatHeader();
+      toast(`记忆 +${added} 条`);
+    }else if(manual){
+      toast('没有新的记忆');
+    }
+  }catch(e){
+    if(manual) toast('提炼失败：' + (e.message || ''));
+  }
+}
+function maybeAutoMemory(){
+  const charId = chatState.charId;
+  if(!charId) return;
+  if(!chatCfg.autoMem[charId]) return;
+  const n = chatState.messages.filter(m => m.content || m.image).length;
+  if(n < 4 || n % 6 !== 0) return;
+  extractMemory(false);
+}
+
+function renderChatSheet(){
+  const charId = chatState.charId;
+  const c = chars.find(x => x.id === charId);
+  if(!c) return;
+
+  $('#chatCharAvatar').value = c.emoji || '';
+  $('#chatUserAvatar').value = chatCfg.userAvatar || '';
+  $('#chatUserName').value = chatCfg.userName || '';
+  $('#cfAvatarPreview').innerHTML = avatarHtml(c.emoji, '🖋️');
+  $('#userAvatarPreview').innerHTML = avatarHtml(chatCfg.userAvatar, '🙂');
+
+  const t = (typeof chatCfg.temps[charId] === 'number') ? chatCfg.temps[charId] : 0.8;
+  $('#chatTemp').value = t;
+  $('#chatTempVal').textContent = Number(t).toFixed(2);
+
+  const freq = getStickerFreq(charId);
+  $('#chatStickerFreq').value = freq;
+  $('#chatStickerFreqVal').textContent = freq + '%';
+  updateStickerFreqHint();
+
+  const arr = memories[charId] || [];
+  const list = $('#chatMemList');
+  if(!arr.length){
+    list.innerHTML = '<div class="empty" style="padding:12px 0;font-size:13px">还没有记忆。可以手动添加，或让 AI 自动提炼。</div>';
+  }else{
+    list.innerHTML = arr.map(m => `
+      <div class="mem-item">
+        <div class="mt">${escapeHtml(m.text)}</div>
+        <button data-delmem="${escapeHtml(String(m.id))}" title="删除">×</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-delmem]').forEach(b => {
+      b.onclick = () => {
+        memories[charId] = (memories[charId] || []).filter(m => String(m.id) !== b.dataset.delmem);
+        saveMemories();
+        renderChatSheet();
+        renderChatHeader();
+      };
+    });
+  }
+  $('#chatAutoMem').checked = !!chatCfg.autoMem[charId];
+  updateStickerCount();
+}
+function updateStickerFreqHint(){
+  const freq = parseFloat($('#chatStickerFreq').value) || 0;
+  const hint = $('#stickerFreqHint');
+  if(!stickers.length){
+    hint.innerHTML = '还没有导入表情包，去「管理表情包库」导入后角色才能使用。';
+    return;
+  }
+  hint.textContent = '当前：' + stickerFreqText(freq)
+    + (freq === 0 ? '（角色不会发表情包）' : '。角色会根据对话情绪自行决定是否使用。');
+}
+function openChatSheet(){
+  renderChatSheet();
+  $('#chatSheetMask').hidden = false;
+}
+function closeChatSheet(){ $('#chatSheetMask').hidden = true; }
+
+/* ============ 事件绑定 ============ */
+function bindEvents(){
+  $$('#nav button').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+  // 练习
+  $('#btnNewPrompt').onclick = () => pickPromptForType(false);
+  $('#writingArea').addEventListener('input', updateWriteGoal);
+  $('#writingArea').addEventListener('keydown', e => {
+    if((e.metaKey || e.ctrlKey) && e.key === 'Enter'){
+      e.preventDefault();
+      $('#btnReview').click();
+    }
+  });
+  $('#charSelect').addEventListener('change', () => {
+    renderWriteFavorHint();
+    if(!$('#panel-read').hidden) renderRead();
+  });
+  $('#btnReview').onclick = () => {
+    if($('#btnReview').dataset.mode === 'stop'){
+      if(abortCtrl) abortCtrl.abort();
+      return;
+    }
+    runReview();
+  };
+  $('#btnSaveWork').onclick = saveWork;
+
+  document.addEventListener('click', e => {
+    const badge = e.target.closest && e.target.closest('[data-favor]');
+    if(badge){ openFavorModal(badge.dataset.favor); }
+  });
+
+  $('#favorClose').onclick = closeFavorModal;
+  $('#favorModal').addEventListener('click', e => {
+    if(e.target === $('#favorModal')) closeFavorModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      if(!$('#imgViewer').hidden) $('#imgViewer').hidden = true;
+      else if(!$('#favorModal').hidden) closeFavorModal();
+      else if(!$('#chatSheetMask').hidden) closeChatSheet();
+      else if(!$('#stickerPanel').hidden) closeStickerPanel();
+      else if(!$('#chatOverlay').hidden) closeChat();
+    }
+  });
+
+  // 阅读
+  $('#btnCheckin').onclick = checkinToday;
+  $('#btnNewRec').onclick = renderRecommend;
+  $('#btnTimer').onclick = () => {
+    if(timer.running){
+      clearInterval(timer.id);
+      timer.running = false;
+      const mins = Math.max(1, Math.round(timer.sec / 60));
+      recordRead(mins);
+      timer.sec = 0;
+      $('#timerDisplay').textContent = '00:00';
+      $('#btnTimer').textContent = '开始计时';
+      renderRead();
+      toast(`已记录 ${mins} 分钟`);
+    }else{
+      timer.running = true;
+      timer.sec = 0;
+      $('#btnTimer').textContent = '结束并记录';
+      timer.id = setInterval(() => {
+        timer.sec++;
+        const m = String(Math.floor(timer.sec / 60)).padStart(2,'0');
+        const s = String(timer.sec % 60).padStart(2,'0');
+        $('#timerDisplay').textContent = m + ':' + s;
+      }, 1000);
+    }
+  };
+  $('#btnAddExcerpt').onclick = () => {
+    const text = $('#excerptText').value.trim();
+    if(!text){ toast('先抄一句吧'); return; }
+    readData.excerpts.unshift({
+      id: Date.now(),
+      text,
+      source: $('#excerptSource').value.trim(),
+      date: todayKey()
+    });
+    LS.set('bg_read', readData);
+    $('#excerptText').value = '';
+    $('#excerptSource').value = '';
+    renderRead();
+    toast('已收录');
+  };
+
+  // 角色
+  $('#btnNewChar').onclick = () => openCharForm(null);
+  $('#cfSave').onclick = saveCharForm;
+  $('#cfCancel').onclick = () => { $('#charForm').hidden = true; editingCharId = null; };
+
+  // 设置
+  $('#btnSaveSettings').onclick = saveSettings;
+  $('#btnTestApi').onclick = testApi;
+  $('#btnFetchModels').onclick = fetchModels;
+  $('#modelSearch').addEventListener('input', renderModelList);
+  $('#setModel').addEventListener('input', renderModelList);
+  $('#btnClearModels').onclick = () => {
+    modelCache = [];
+    LS.set('bg_models', modelCache);
+    renderModelList();
+    toast('已清空模型列表');
+  };
+
+  // 备份
+  $('#btnExportBackup').onclick = exportBackup;
+  $('#btnImportBackup').onclick = () => $('#backupFileInput').click();
+  $('#backupFileInput').addEventListener('change', async e => {
+    const file = (e.target.files || [])[0];
+    e.target.value = '';
+    if(file) await importBackup(file);
+  });
+  $('#btnResetAll').onclick = resetAllData;
+
+  /* ---------- 聊天 ---------- */
+  $('#chatBack').onclick = closeChat;
+  $('#chatClearBtn').onclick = () => {
+    if(!chatState.charId) return;
+    if(!confirm('清空与这个角色的全部聊天记录？记忆和表情包不会被删除。')) return;
+    chatState.messages = [];
+    saveChat();
+    renderChat();
+    toast('对话已清空');
+  };
+  $('#chatSettingsBtn').onclick = openChatSheet;
+  $('#chatSheetClose').onclick = closeChatSheet;
+  $('#chatSheetMask').addEventListener('click', e => {
+    if(e.target === $('#chatSheetMask')) closeChatSheet();
+  });
+
+  const ci = $('#chatInput');
+  ci.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){
+      e.preventDefault();
+      if(chatState.streaming) return;
+      sendChat();
+    }
+  });
+  ci.addEventListener('input', () => {
+    ci.style.height = 'auto';
+    ci.style.height = Math.min(130, ci.scrollHeight) + 'px';
+  });
+
+  $('#chatSend').onclick = () => {
+    if(chatState.streaming){
+      if(chatState.abort) chatState.abort.abort();
+      return;
+    }
+    sendChat();
+  };
+
+  // 表情包按钮
+  $('#chatStickerBtn').onclick = e => {
+    e.stopPropagation();
+    toggleStickerPanel();
+  };
+  $('#stickerManageBtn').onclick = () => {
+    stickerManageMode = !stickerManageMode;
+    $('#stickerManageBtn').textContent = stickerManageMode ? '完成' : '管理';
+    renderStickerPanel();
+  };
+
+  $('#stickerSortBtn').onclick = () => {
+    stickerSort = (stickerSort === 'time') ? 'name' : 'time';
+    LS.set('bg_stickersort', stickerSort);
+    renderStickerPanel();
+    toast(stickerSort === 'name' ? '已按名称排序' : '已按时间排序');
+  };
+
+  // 表情包网格：事件委托
+  const grid = $('#stickerGrid');
+  grid.addEventListener('click', e => {
+    const del = e.target.closest('[data-delsid]');
+    if(del){
+      e.stopPropagation();
+      const id = del.dataset.delsid;
+      stickers = stickers.filter(s => String(s.id) !== id);
+      saveStickers();
+      renderStickerPanel();
+      renderChatSheet();
+      toast('已删除');
+      return;
+    }
+    const cell = e.target.closest('.sticker-cell');
+    if(!cell) return;
+    if(cell.classList.contains('sending')) return;
+    const st = stickers.find(x => String(x.id) === cell.dataset.sid);
+    if(!st) return;
+    sendSticker(st);
+  });
+
+  $('#stickerImportBtn').onclick = () => $('#stickerFileInput').click();
+  $('#stickerFileInput').addEventListener('change', async e => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if(files.length) await importStickers(files);
+  });
+  $('#stickerDirBtn').onclick = () => $('#stickerDirInput').click();
+  $('#stickerDirInput').addEventListener('change', async e => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if(files.length) await importStickers(files);
+  });
+  $('#stickerDocxBtn').onclick = () => $('#stickerDocxInput').click();
+  $('#stickerDocxInput').addEventListener('change', async e => {
+    const file = (e.target.files || [])[0];
+    e.target.value = '';
+    if(file) await importStickersFromDocx(file);
+  });
+
+  // 图片
+  $('#chatImageBtn').onclick = () => $('#chatImageInput').click();
+  $('#chatImageInput').addEventListener('change', async e => {
+    const file = (e.target.files || [])[0];
+    e.target.value = '';
+    if(file) await sendImageFile(file);
+  });
+
+  // 头像上传
+  $('#cfAvatarUploadBtn').onclick = () => {
+    avatarUploadTarget = 'char';
+    $('#avatarFileInput').click();
+  };
+  $('#userAvatarUploadBtn').onclick = () => {
+    avatarUploadTarget = 'user';
+    $('#avatarFileInput').click();
+  };
+  $('#avatarFileInput').addEventListener('change', async e => {
+    const file = (e.target.files || [])[0];
+    e.target.value = '';
+    if(!file || !avatarUploadTarget) return;
+    await uploadAvatar(file, avatarUploadTarget);
+    avatarUploadTarget = null;
+  });
+
+  // 点外部关面板
+  $('#chatOverlay').addEventListener('click', e => {
+    if($('#stickerPanel').hidden) return;
+    if(e.target.closest('#stickerPanel')) return;
+    if(e.target.closest('#chatStickerBtn')) return;
+    closeStickerPanel();
+  });
+
+  // 图片查看
+  document.addEventListener('click', e => {
+    if(e.target.classList && e.target.classList.contains('msg-image')){
+      $('#imgViewerImg').src = e.target.src;
+      $('#imgViewer').hidden = false;
+    }
+  });
+  $('#imgViewer').onclick = () => { $('#imgViewer').hidden = true; };
+
+  // 头像输入框
+  $('#chatCharAvatar').addEventListener('input', e => {
+    $('#cfAvatarPreview').innerHTML = avatarHtml(e.target.value, '🖋️');
+  });
+  $('#chatUserAvatar').addEventListener('input', e => {
+    $('#userAvatarPreview').innerHTML = avatarHtml(e.target.value, '🙂');
+  });
+  $('#chatCharAvatar').addEventListener('change', e => {
+    const c = chars.find(x => x.id === chatState.charId);
+    if(!c) return;
+    c.emoji = e.target.value.trim() || '🖋️';
+    LS.set('bg_chars', chars);
+    renderChatHeader();
+    renderChat();
+    renderChars();
+    toast('角色头像已保存');
+  });
+  $('#chatUserAvatar').addEventListener('change', e => {
+    chatCfg.userAvatar = e.target.value.trim() || '🙂';
+    saveChatCfg();
+    renderChat();
+    toast('你的头像已保存');
+  });
+  $('#chatUserName').addEventListener('change', e => {
+    chatCfg.userName = e.target.value.trim() || '我';
+    saveChatCfg();
+    toast('昵称已保存');
+  });
+
+  // 温度
+  $('#chatTemp').addEventListener('input', e => {
+    $('#chatTempVal').textContent = Number(parseFloat(e.target.value)).toFixed(2);
+  });
+  $('#chatTemp').addEventListener('change', e => {
+    const v = parseFloat(e.target.value);
+    if(!chatState.charId) return;
+    chatCfg.temps[chatState.charId] = v;
+    saveChatCfg();
+    toast('温度已保存 · ' + v.toFixed(2));
+  });
+
+  // 表情包频率
+  $('#chatStickerFreq').addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10) || 0;
+    $('#chatStickerFreqVal').textContent = v + '%';
+    updateStickerFreqHint();
+  });
+  $('#chatStickerFreq').addEventListener('change', e => {
+    const v = parseInt(e.target.value, 10) || 0;
+    if(!chatState.charId) return;
+    chatCfg.stickerFreq[chatState.charId] = v;
+    saveChatCfg();
+    renderChatHeader();
+    toast('表情包频率已保存 · ' + v + '%');
+  });
+  $('#chatStickerManageBtn').onclick = () => {
+    closeChatSheet();
+    stickerManageMode = true;
+    $('#stickerManageBtn').textContent = '完成';
+    openStickerPanel();
+    renderStickerPanel();
+  };
+
+  // 记忆
+  $('#chatMemAdd').onclick = () => {
+    const v = $('#chatMemInput').value.trim();
+    if(!v || !chatState.charId) return;
+    const arr = memories[chatState.charId] || (memories[chatState.charId] = []);
+    arr.push({ id: Date.now() + Math.random(), text: v, ts: Date.now() });
+    saveMemories();
+    $('#chatMemInput').value = '';
+    renderChatSheet();
+    renderChatHeader();
+    toast('已添加记忆');
+  };
+  $('#chatMemInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ e.preventDefault(); $('#chatMemAdd').click(); }
+  });
+  $('#chatMemExtract').onclick = () => extractMemory(true);
+  $('#chatAutoMem').addEventListener('change', e => {
+    if(!chatState.charId) return;
+    chatCfg.autoMem[chatState.charId] = e.target.checked;
+    saveChatCfg();
+    toast(e.target.checked ? '已开启自动记忆' : '已关闭自动记忆');
+  });
+}
+
+/* ============ 初始化 ============ */
+function init(){
+  bindEvents();
+  initLevelUI();
+
+  $('#writingArea').placeholder = WRITE_TYPES[writeType].placeholder;
+  $('#promptLabel').textContent = '今日' + WRITE_TYPES[writeType].label + '题目';
+  renderTypeChips();
+  pickPromptForType(true);
+
+  renderChars();
+  renderRead();
+  renderWorks();
+  fillSettingsForm();
+  updateWriteGoal();
+  renderRecommend();
+  renderWriteFavorHint();
+  renderStickerPanel();
+  updateBackupInfo();
+  switchTab('write');
+}
+
+init();
+</script>
+</body>
+</html>
